@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
 import JourneyTimeline from "./components/JourneyTimeline";
 import CaseStudies from "./components/CaseStudies";
-import Skills from "./components/Skills";
+import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
 import GlobalBackground from "./components/GlobalBackground";
 
-// Enhanced scrolling and animation CSS
 const scrollStyles = `
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
@@ -22,11 +21,9 @@ const scrollStyles = `
 function App() {
   return (
     <div className="App" data-testid="app-root">
-      {/* Global Background Layers */}
       <GlobalBackground />
       <style>{scrollStyles}</style>
-      
-      {/* Navigation */}
+
       <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-16">
@@ -37,24 +34,21 @@ function App() {
               <a href="#hero" data-testid="nav-home-link" className="text-gray-300 hover:text-white transition-colors duration-300">Home</a>
               <a href="#story" data-testid="nav-story-link" className="text-gray-300 hover:text-white transition-colors duration-300">My Journey</a>
               <a href="#portfolio" data-testid="nav-projects-link" className="text-gray-300 hover:text-white transition-colors duration-300">Case Studies</a>
-              <a href="#skills" data-testid="nav-skills-link" className="text-gray-300 hover:text-white transition-colors duration-300">Toolkit</a>
+              <a href="#skills" data-testid="nav-skills-link" className="text-gray-300 hover:text-white transition-colors duration-300">Toolkit &amp; Expertise</a>
               <a href="#contact" data-testid="nav-contact-link" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
       <main data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
         <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
-        {/* Keeping existing Skills component to represent Toolkit & Expertise for now */}
-        <section id="skills" data-testid="section-skills"><Skills /></section>
+        <section id="skills" data-testid="section-toolkit"><Toolkit /></section>
         <section id="contact" data-testid="section-contact"><Contact /></section>
       </main>
 
-      {/* Footer */}
       <footer className="bg-slate-900 border-t border-white/10 py-12" data-testid="footer">
         <div className="container mx-auto px-6">
           <div className="text-center">
