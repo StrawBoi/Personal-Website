@@ -58,8 +58,15 @@ const JourneyTimeline = () => {
   return (
     <section id="story" className="relative py-24 bg-slate-900/50" data-testid="section-journey">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: "Inter, sans-serif" }}>My Journey</h2>
+          <p
+            className="mt-5 max-w-3xl mx-auto text-gray-300 text-lg md:text-xl leading-relaxed"
+            style={{ fontFamily: "'Roboto Mono', ui-monospace, Menlo, monospace" }}
+            data-testid="journey-intro-text"
+          >
+            My career has been a deliberate journey of three connected acts: understanding people, building technology, and driving strategic growth. Each role, from customer support to the founding of a creative startup, has been a step towards a single goal: using technology to create measurable business impact.
+          </p>
         </div>
 
         <div ref={containerRef} className="relative flex flex-col items-center">
