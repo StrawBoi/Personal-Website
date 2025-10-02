@@ -97,20 +97,40 @@ const CinematicHero = () => {
                 x="0"
                 y="120"
                 fontFamily="'Dancing Script', cursive"
-                fontSize="96"
+                fontSize="110"
                 fontWeight="700"
                 fill="transparent"
                 stroke="#2dd4bf"
-                strokeWidth="2.5"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 style={{
-                  filter: 'drop-shadow(0 0 8px rgba(45,212,191,0.6))',
-                  strokeDasharray: sigLength || 1200,
-                  strokeDashoffset: startSignature ? 0 : (sigLength || 1200),
+                  filter: 'drop-shadow(0 0 8px rgba(45,212,191,0.55))',
+                  strokeDasharray: (sigLength || 1200) * 1.05,
+                  strokeDashoffset: startSignature ? 0 : (sigLength || 1200) * 1.05,
                   transition: startSignature ? 'stroke-dashoffset 2.6s ease-in-out' : 'none',
                 }}
               >
                 Ahmed Mostafa
               </text>
+              {/* After the line finishes drawing, gently fade in a crisp outline for clarity */}
+              <motion.text
+                x="0"
+                y="120"
+                fontFamily="'Dancing Script', cursive"
+                fontSize="110"
+                fontWeight="700"
+                fill="transparent"
+                stroke="#2dd4bf"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: startSignature ? 1 : 0 }}
+                transition={{ delay: 2.7, duration: 0.6 }}
+              >
+                Ahmed Mostafa
+              </motion.text>
             </svg>
           </div>
         </div>
