@@ -69,22 +69,23 @@ function App() {
   // }
 
   return (
-    <div className="App">
+    <div className="App" data-testid="app-root">
       <style>{scrollStyles}</style>
       
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+      <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-16">
-            <div className="text-white font-bold text-xl">
+            <div className="text-white font-bold text-xl" data-testid="navbar-brand">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-400">
                 Portfolio
               </span>
             </div>
             
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex space-x-8" data-testid="navbar-links">
               <a 
                 href="#hero" 
+                data-testid="nav-home-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -95,6 +96,7 @@ function App() {
               </a>
               <a 
                 href="#story" 
+                data-testid="nav-story-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -105,6 +107,7 @@ function App() {
               </a>
               <a 
                 href="#experience" 
+                data-testid="nav-experience-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -115,6 +118,7 @@ function App() {
               </a>
               <a 
                 href="#portfolio" 
+                data-testid="nav-projects-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -125,6 +129,7 @@ function App() {
               </a>
               <a 
                 href="#skills" 
+                data-testid="nav-skills-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -135,6 +140,7 @@ function App() {
               </a>
               <a 
                 href="#contact" 
+                data-testid="nav-contact-link"
                 className="text-gray-300 hover:text-white transition-colors duration-300"
                 onClick={(e) => {
                   e.preventDefault();
@@ -149,50 +155,50 @@ function App() {
       </nav>
       
       {/* Main Content */}
-      <main>
+      <main data-testid="main-content">
         {/* Hero Section - No animation needed, always visible */}
-        <section id="hero">
+        <section id="hero" data-testid="section-hero">
           <CinematicHero />
         </section>
 
         {/* My Story Section */}
         <ScrollAnimation>
-          <section id="story">
+          <section id="story" data-testid="section-story">
             <MyStory />
           </section>
         </ScrollAnimation>
 
         {/* Experience/Case Studies Section */}
         <ScrollAnimation>
-          <section id="experience">
+          <section id="experience" data-testid="section-experience">
             <WorkExperience />
           </section>
         </ScrollAnimation>
 
         {/* Projects/Portfolio Section */}
         <ScrollAnimation>
-          <section id="portfolio">
+          <section id="portfolio" data-testid="section-portfolio">
             <Portfolio />
           </section>
         </ScrollAnimation>
 
         {/* Skills Section */}
         <ScrollAnimation>
-          <section id="skills">
+          <section id="skills" data-testid="section-skills">
             <Skills />
           </section>
         </ScrollAnimation>
 
         {/* Contact Section */}
         <ScrollAnimation>
-          <section id="contact">
+          <section id="contact" data-testid="section-contact">
             <Contact />
           </section>
         </ScrollAnimation>
       </main>
       
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-white/10 py-12">
+      <footer className="bg-slate-900 border-t border-white/10 py-12" data-testid="footer">
         <div className="container mx-auto px-6">
           <div className="text-center">
             <div className="mb-8">
@@ -206,10 +212,11 @@ function App() {
               </p>
             </div>
             
-            <div className="flex justify-center space-x-6 mb-8">
+            <div className="flex justify-center space-x-6 mb-8" data-testid="footer-links">
               <a 
                 href="mailto:Ahmed.ha.mahmoud@outlook.com" 
                 className="text-gray-400 hover:text-emerald-400 transition-colors duration-300"
+                data-testid="footer-email-link"
               >
                 Email
               </a>
@@ -218,6 +225,7 @@ function App() {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-blue-400 transition-colors duration-300"
+                data-testid="footer-linkedin-link"
               >
                 LinkedIn
               </a>
@@ -228,6 +236,7 @@ function App() {
                   document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="text-gray-400 hover:text-amber-400 transition-colors duration-300"
+                data-testid="footer-back-to-top"
               >
                 Back to Top
               </a>

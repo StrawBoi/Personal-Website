@@ -65,6 +65,7 @@ const CinematicHero = () => {
         id="home"
         ref={containerRef}
         className="relative min-h-screen overflow-hidden"
+        data-testid="hero-home-section"
       >
       {/* Video Background */}
       <motion.div 
@@ -78,6 +79,7 @@ const CinematicHero = () => {
           muted={isMuted}
           loop
           playsInline
+          data-testid="hero-bg-video"
         >
           <source 
             src="https://customer-assets.emergentagent.com/job_cinema-folio/artifacts/vaplhedp_A_futuristic_highresolution_202510012200.mp4"
@@ -86,8 +88,8 @@ const CinematicHero = () => {
           Your browser does not support the video tag.
         </video>
         
-        {/* Semi-transparent black overlay (60% opacity) */}
-        <div className="absolute inset-0 bg-black bg-opacity-60" />
+        {/* Semi-transparent black overlay (reduced to 40% for better visibility) */}
+        <div className="absolute inset-0 bg-black bg-opacity-40" data-testid="hero-overlay" />
       </motion.div>
 
       {/* Mute/Unmute Button */}
@@ -99,6 +101,8 @@ const CinematicHero = () => {
         transition={{ delay: 1, duration: 0.5 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
+        data-testid="mute-toggle-button"
+        aria-label={isMuted ? 'Unmute background video' : 'Mute background video'}
       >
         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       </motion.button>
@@ -133,6 +137,7 @@ const CinematicHero = () => {
                   duration: 1.2, 
                   ease: [0.6, -0.05, 0.01, 0.99] 
                 }}
+                data-testid="hero-title"
               >
                 AHMED MOSTAFA
               </motion.h1>
@@ -158,6 +163,7 @@ const CinematicHero = () => {
                   duration: 1.0, 
                   ease: [0.6, -0.05, 0.01, 0.99] 
                 }}
+                data-testid="hero-subtitle"
               >
                 A results-oriented professional bridging the gap between technology, customer experience, and business growth.
               </motion.h2>
@@ -192,6 +198,7 @@ const CinematicHero = () => {
                   scale: 1.05
                 }}
                 whileTap={{ scale: 0.95 }}
+                data-testid="hero-cta-button"
               >
                 Explore My Work
               </motion.button>
@@ -213,6 +220,7 @@ const CinematicHero = () => {
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           whileHover={{ scale: 1.1 }}
+          data-testid="scroll-down-button"
         >
           <ChevronDown 
             className="w-8 h-8" 
