@@ -47,7 +47,7 @@ const TiltCard = ({ item, index }) => {
       ref={cardRef}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className="relative rounded-2xl p-6 border transition-transform will-change-transform"
+      className="group relative rounded-2xl p-6 border transition-transform will-change-transform"
       style={{
         ...style,
         background: "rgba(255,255,255,0.08)",
@@ -66,16 +66,14 @@ const TiltCard = ({ item, index }) => {
         <p className="text-gray-200 mt-4">{item.impact}</p>
       </div>
 
-      {/* Hover button */}
-      <motion.button
-        className="absolute bottom-4 right-4 px-4 py-2 rounded-md border text-white/90"
+      {/* Hover button appears on card hover */}
+      <button
+        className="absolute bottom-4 right-4 px-4 py-2 rounded-md border text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.25)" }}
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 1 }}
         data-testid={`case-card-${index}-cta`}
       >
         View Details
-      </motion.button>
+      </button>
     </motion.div>
   );
 };
