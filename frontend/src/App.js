@@ -29,9 +29,6 @@ function App() {
       <GlobalBackground />
       <style>{scrollStyles}</style>
 
-      {/* Left-side navigational data-stream */}
-      <DataStream mainRef={mainRef} sectionIds={sectionIds} />
-
       <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-16">
@@ -50,7 +47,11 @@ function App() {
         </div>
       </nav>
 
-      <main ref={mainRef} data-testid="main-content">
+      {/* Make main relative so DataStream can be absolutely positioned inside */}
+      <main ref={mainRef} className="relative" data-testid="main-content">
+        {/* Left-side navigational data-stream anchored to hero bottom */}
+        <DataStream mainRef={mainRef} sectionIds={sectionIds} />
+
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
         <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
