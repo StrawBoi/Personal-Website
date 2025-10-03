@@ -3,32 +3,28 @@ import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 /**
  * Navigational Data-Stream (Left & Right side light streams)
- * - Background stays TRUE BLACK (#000)
+ * - Background TRUE BLACK (#000)
  * - Two dimmed teal light streams start just below the hero and "light up" progressively to page end
- * - Smooth reveal tied to scroll; subtle rolling texture for motion
  */
-const TEAL = 'rgba(20,184,166,1)';
-const TEAL_DIM = 'rgba(20,184,166,0.12)';
-const TEAL_BRIGHT = 'rgba(20,184,166,0.35)';
+const TEAL_DIM = 'rgba(20,184,166,0.18)';
+const TEAL_BRIGHT = 'rgba(20,184,166,0.45)';
 
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 
-const DataStream = ({ mainRef, sectionIds = [] }) => {
-  const containerRef = useRef(null);
+const DataStream = ({ mainRef }) => {
   const [heroHeight, setHeroHeight] = useState(0);
   const [streamHeight, setStreamHeight] = useState(0);
-  const [heroRatio, setHeroRatio] = useState(0); // fraction of main height occupied by hero
+  const [heroRatio, setHeroRatio] = useState(0); // fraction of main occupied by hero
 
   // Scroll progress across main
   const { scrollYProgress } = useScroll({ target: mainRef, offset: ["start start", "end end"] });
-  // Reveal progress: 0 until passing hero bottom, then 0->1 to end
+  // Reveal progress after hero
   const revealProgress = useTransform(scrollYProgress, (p) => {
     const r = heroRatio || 0;
     if (p <= r) return 0;
     const denom = Math.max(0.0001, 1 - r);
     return clamp01((p - r) / denom);
   });
-  // Smoothen marker progress (used if needed for future)
   const revealSpring = useSpring(revealProgress, { stiffness: 120, damping: 20, mass: 0.3 });
 
   useEffect(() => {
@@ -47,9 +43,9 @@ const DataStream = ({ mainRef, sectionIds = [] }) => {
       const mainTopAbs = mainRect.top + window.scrollY;
       const mainBottomAbs = mainRect.bottom + window.scrollY;
       const mainTotal = Math.max(1, mainBottomAbs - mainTopAbs);
+
       const streamH = Math.max(0, mainEl.scrollHeight - heroH);
       setStreamHeight(streamH);
-
       setHeroRatio(clamp01(heroH / (heroH + streamH)));
     };
 
@@ -75,39 +71,47 @@ const DataStream = ({ mainRef, sectionIds = [] }) => {
     return (
       <div
         className={`pointer-events-none absolute ${side === 'left' ? 'left-0' : 'right-0'}`}
-        style={{ top: heroHeight, height: streamHeight, width: 56 }}
+        style={{ top: heroHeight, height: streamHeight, width: 72, zIndex: 30 }}
         aria-hidden
         data-testid={`datastream-${side}`}
       >
-        {/* Base dim beam (full length, subtle) */}
+        {/* Base dim beam (always visible) */}
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(closest-side, ${TEAL_DIM} 0%, rgba(20,184,166,0.06) 55%, rgba(0,0,0,0) 100%)`,
-            filter: 'blur(18px)',
-            opacity: 0.9,
+            background: `radial-gradient(closest-side, ${TEAL_DIM} 0%, rgba(20,184,166,0.10) 55%, rgba(0,0,0,0) 100%)`,
+            filter: 'blur(22px)',
+            opacity: 0.95,
+            mixBlendMode: 'screen',
           }}
         />
-        {/* Rolling texture overlay (subtle) */}
+        {/* Rolling texture overlay (subtle motion) */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 2px, transparent 10px)`,
+            backgroundImage: `repeating-linear-gradient(to bottom, rgba(255,255,255,0.05) 0, rgba(255,255,255,0.05) 2px, transparent 10px)`,
             animation: 'roll 12s linear infinite',
-            opacity: 0.25,
+            opacity: 0.22,
+            mixBlendMode: 'screen',
           }}
         />
-        {/* Bright reveal layer: scaleY with scroll to "light up" bit by bit */}
+        {/* Bright reveal layer that lights up with scroll */}
         <motion.div
           className="absolute left-0 right-0 origin-top"
           style={{
             top: 0,
             bottom: 0,
             scaleY: revealSpring,
-            background: `radial-gradient(closest-side, ${TEAL_BRIGHT} 0%, rgba(20,184,166,0.18) 55%, rgba(0,0,0,0) 100%)`,
-            filter: 'blur(12px)',
+            background: `radial-gradient(closest-side, ${TEAL_BRIGHT} 0%, rgba(20,184,166,0.22) 55%, rgba(0,0,0,0) 100%)`,
+            filter: 'blur(16px)',
+            mixBlendMode: 'screen',
           }}
           data-testid={`datastream-${side}-reveal`}
+        />
+        {/* Debug edge (can be removed later) */}
+        <div
+          className="absolute top-0 bottom-0"
+          style={{ [side === 'left' ? 'left' : 'right']: 0, width: 1, background: 'rgba(20,184,166,0.35)' }}
         />
       </div>
     );
@@ -117,10 +121,7 @@ const DataStream = ({ mainRef, sectionIds = [] }) => {
     <>
       <Beam side="left" />
       <Beam side="right" />
-      {/* Local keyframes for rolling texture */}
-      <style>{`
-        @keyframes roll { from { background-position-y: 0; } to { background-position-y: 200px; } }
-      `}</style>
+      <style>{`@keyframes roll { from { background-position-y: 0; } to { background-position-y: 200px; } }`}</style>
     </>
   );
 };
