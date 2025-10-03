@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
-import MyJourneyCoverflow from "./components/MyJourneyCoverflow";
+import JourneyMindMap from "./components/JourneyMindMap";
 import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
@@ -52,7 +52,7 @@ function App() {
 
       <main ref={mainRef} className="relative" data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
-        <section id="story" data-testid="section-journey"><MyJourneyCoverflow /></section>
+        <section id="story" data-testid="section-journey"><JourneyMindMap /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
         <section id="skills" data-testid="section-toolkit"><Toolkit /></section>
