@@ -8,7 +8,7 @@ const items = [
   { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023", icon: Cpu },
   { title: "SEO Optimization and Sales Representative | Wisdek", period: "JANUARY 2017 – DECEMBER 2017", icon: LineChart },
   { title: "Subject Matter Expert | Altice One", period: "2015 – 2016", icon: GraduationCap },
-  // Added experiences
+  // Added experiences (update content later as needed)
   { title: "Business Consultant | Ghasa Marine", period: "MAY 2023 – DECEMBER 2023", icon: Briefcase },
   { title: "Operations Lead | [Add Company]", period: "[Add Period]", icon: Wrench },
   { title: "Product Strategist | [Add Company]", period: "[Add Period]", icon: Rocket },
@@ -22,6 +22,8 @@ const JourneyTimeline = () => {
 
   // Determine which trio of cards should be focused based on scroll progress
   const [focusIndex, setFocusIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (p) => {
       const idx = Math.max(0, Math.min(items.length - 1, Math.round(p * (items.length - 1))));
@@ -30,26 +32,34 @@ const JourneyTimeline = () => {
     return () => unsub && unsub();
   }, [scrollYProgress]);
 
-  // Card component with depth/blur based on focusIndex
+  // Card component with stronger concave depth + hover lift and side panel
   const Card = ({ i, title, period, Icon }) => {
-    const isFocused = Math.abs(i - focusIndex) <= 1; // trio: focus-1, focus, focus+1
+    const isFocusedTrio = Math.abs(i - focusIndex) <= 1; // center trio focus
+    const isHovered = hoveredIndex === i;
 
-    const baseTransform = isFocused
-      ? "translateZ(120px) scale(1)"
-      : "translateZ(-80px) scale(0.9)";
-    const rotate = i % 2 === 0 ? "rotateY(-6deg)" : "rotateY(6deg)"; // concave feel
+    // Stronger concave: foreground pops, background recedes more
+    const depthTransform = isHovered
+      ? "translateZ(260px) scale(1.03)"
+      : isFocusedTrio
+      ? "translateZ(170px) scale(1.0)"
+      : "translateZ(-140px) scale(0.88)";
+
+    const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)"; // more pronounced
 
     return (
       <div
-        className={`relative w-full md:w-[62%] ${i % 2 === 0 ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
+        className={`relative w-full md:w-[64%] ${i % 2 === 0 ? "md:mr-14 md:self-end" : "md:ml-14 md:self-start"}`}
         style={{
           transformStyle: "preserve-3d",
-          transform: `${baseTransform} ${rotate}`,
-          transition: "transform 420ms ease, filter 280ms ease, opacity 280ms ease",
-          filter: isFocused ? "none" : "blur(2.2px)",
-          opacity: isFocused ? 1 : 0.65,
+          transform: `${depthTransform} ${rotate}`,
+          transition: "transform 420ms ease, filter 280ms ease, opacity 280ms ease, box-shadow 280ms ease",
+          filter: isHovered ? "none" : isFocusedTrio ? "none" : "blur(3px)",
+          opacity: isHovered ? 1 : isFocusedTrio ? 1 : 0.5,
+          boxShadow: isHovered ? "0 20px 60px rgba(20,184,166,0.15)" : "none",
           willChange: "transform, filter, opacity",
         }}
+        onMouseEnter={() => setHoveredIndex(i)}
+        onMouseLeave={() => setHoveredIndex(null)}
         data-testid={`journey-card-${i}`}
       >
         {/* Connector from center line to card */}
@@ -74,7 +84,7 @@ const JourneyTimeline = () => {
 
         {/* Glassmorphism card (larger) */}
         <div
-          className="rounded-2xl p-7 border"
+          className="rounded-2xl p-7 border cursor-pointer"
           style={{
             background: "rgba(255,255,255,0.08)",
             backdropFilter: "blur(14px)",
@@ -105,9 +115,9 @@ const JourneyTimeline = () => {
           </p>
         </div>
 
-        {/* Depth container with perspective for 3D concave effect */}
-        <div ref={containerRef} className="relative flex flex-col items-center" style={{ perspective: "1200px" }}>
-          {/* Center vertical line that draws with scroll */}
+        {/* Depth container with perspective for stronger 3D concave effect */}
+        <div ref={containerRef} className="relative flex flex-col items-center" style={{ perspective: "1400px" }}>
+          {/* Center vertical line */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px" aria-hidden>
             <div className="w-px h-full bg-gradient-to-b from-emerald-400 via-amber-300 to-blue-400 opacity-70" />
           </div>
@@ -122,6 +132,46 @@ const JourneyTimeline = () => {
           </div>
         </div>
       </div>
+
+      {/* Hover-to-reveal Side Panel (restored and improved) */}
+      <AnimatePresence>
+        {hoveredIndex !== null && (
+          <motion.aside
+            key="journey-sidepanel"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.35, ease: 'easeOut' }}
+            className="fixed top-16 right-0 bottom-0 w-full md:w-[560px] bg-black/95 border-l border-white/10 z-50 overflow-auto"
+            data-testid="journey-hover-panel"
+            onMouseEnter={() => setHoveredIndex(hoveredIndex)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
+            <div className="p-7 space-y-7">
+              <div>
+                <h3 className="text-2xl font-semibold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>{items[hoveredIndex].title}</h3>
+                <p className="text-gray-400 mt-1" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{items[hoveredIndex].period}</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Job Description</h4>
+                <p className="text-gray-300 mt-2">Placeholder description for the role detailing responsibilities and core areas of ownership. Replace this with your actual job description.</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Key Achievement</h4>
+                <p className="text-gray-300 mt-2">Placeholder achievement detailing a specific measurable impact or business outcome delivered in this role.</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Skills Learnt</h4>
+                <ul className="text-gray-300 list-disc pl-5 mt-2 space-y-1">
+                  <li>Placeholder skill 1</li>
+                  <li>Placeholder skill 2</li>
+                  <li>Placeholder skill 3</li>
+                </ul>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
