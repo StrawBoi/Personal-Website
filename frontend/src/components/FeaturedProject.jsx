@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X } from 'lucide-react';
 
-// Provided video URL for Price Intelligence Dashboard
-const PRICE_INTEL_VIDEO = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/c4u5i6oh_Tackle%20_%20Pricing%20Intelligence%20-%20Google%20Chrome%202025-10-03%2020-15-02.mp4";
+// Updated video URL and default title/tagline
+const PRICE_INTEL_VIDEO = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
 
 // Try to capture a poster frame; fallback to gradient if CORS prevents it
 const usePosterFromVideo = (src) => {
@@ -48,7 +48,7 @@ const usePosterFromVideo = (src) => {
   return poster;
 };
 
-const FeaturedProject = ({ title = 'Price Intelligence Dashboard', videoSrc = PRICE_INTEL_VIDEO }) => {
+const FeaturedProject = ({ title = 'Tackle', videoSrc = PRICE_INTEL_VIDEO, tagline = 'Your solution to pricing intelligently!' }) => {
   const cardVideoRef = useRef(null);
   const [hovering, setHovering] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -116,11 +116,11 @@ const FeaturedProject = ({ title = 'Price Intelligence Dashboard', videoSrc = PR
               preload="metadata"
             />
 
-            {/* Title + play icon overlay */}
+            {/* Title + tagline + play icon overlay */}
             <div className="absolute inset-0 z-20 flex items-end justify-between p-5">
               <div>
                 <h3 className="text-white text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>{title}</h3>
-                <p className="text-gray-300 text-sm md:text-base">Hover to preview • Click to open</p>
+                <p className="text-gray-300 text-sm md:text-base">{tagline}</p>
               </div>
               <div className="flex items-center justify-center w-12 h-12 rounded-full"
                    style={{ background: 'rgba(20,184,166,0.15)', border: '1px solid rgba(20,184,166,0.6)' }}>
