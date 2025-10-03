@@ -1,33 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-// Tackle project video (same as before)
 const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
 
 const FeaturedProject = () => {
-  const sectionRef = useRef(null); // outer section with tall height (pin duration)
-  const stickyRef = useRef(null); // inner sticky container
+  const sectionRef = useRef(null);
   const videoRef = useRef(null);
   const [duration, setDuration] = useState(0);
 
-  // Scroll progress for the takeover section (0..1 across 300vh)
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+  // Progress for the takeover zone; start mapping when section top hits 80% viewport
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start 80%", "end 20%"] });
 
-  // Video scale/width animation: 0 -> 1 -> 0 back
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.7, 1, 0.7]);
+  // Width expansion: 70vw -> 100vw quickly (first ~20% progress), then shrink back to 70vw
+  const widthMV = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], ["70vw", "100vw", "100vw", "70vw"]);
+  // Opacity fade near the end for cinematic exit
+  const opacityMV = useTransform(scrollYProgress, [0.75, 1], [1, 0]);
 
-  // Scrub video with scroll
+  // Scrub the video based on progress
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     const onLoaded = () => {
-      try {
-        setDuration(v.duration || 0);
-        v.pause(); // ensure we are in manual scrubbing mode
-        v.currentTime = 0;
-        v.muted = true;
-        v.playsInline = true;
-      } catch (e) {}
+      setDuration(v.duration || 0);
+      v.pause(); v.currentTime = 0; v.muted = true; v.playsInline = true;
     };
     v.addEventListener('loadedmetadata', onLoaded);
     return () => v.removeEventListener('loadedmetadata', onLoaded);
@@ -44,34 +39,36 @@ const FeaturedProject = () => {
         try { v.currentTime = t; } catch (e) {}
       });
     });
-    return () => { if (unsub) unsub(); if (raf) cancelAnimationFrame(raf); };
+    return () => { unsub && unsub(); if (raf) cancelAnimationFrame(raf); };
   }, [scrollYProgress, duration]);
 
   return (
-    <section id="featured-project" ref={sectionRef} className="relative" style={{ height: '300vh' }} data-testid="section-featured-project">
-      {/* Sticky container pinned during the takeover */}
-      <div ref={stickyRef} className="sticky top-0 flex items-center justify-center h-screen">
-        <motion.div
-          style={{ scale }}
-          className="w-[70vw] max-w-[1280px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(20,184,166,0.15)]"
-          data-testid="featured-video-frame"
-        >
-          <video
-            ref={videoRef}
-            src={VIDEO_SRC}
-            className="w-full h-full object-cover bg-black"
-            preload="auto"
-            muted
-            playsInline
-          />
-        </motion.div>
+    <section id="featured-project" ref={sectionRef} className="relative" style={{ height: '320vh' }} data-testid="section-featured-project">
+      {/* Sticky pinned frame; starts pinning when it reaches 80% viewport (via offset mapping) */}
+      <div className="sticky" style={{ top: '20vh' }}>
+        <div className="flex items-center justify-center" style={{ height: '60vh' }}>
+          <motion.div
+            style={{ width: widthMV, opacity: opacityMV }}
+            className="max-w-[1600px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(20,184,166,0.15)] bg-black"
+            data-testid="featured-video-frame"
+          >
+            <video
+              ref={videoRef}
+              src={VIDEO_SRC}
+              className="w-full h-full object-cover"
+              preload="auto"
+              muted
+              playsInline
+            />
+          </motion.div>
+        </div>
       </div>
-      {/* Contextual heading above and spacer below for flow */}
-      <div className="pointer-events-none absolute top-8 left-1/2 -translate-x-1/2 text-center z-10">
+
+      {/* Heading overlay */}
+      <div className="pointer-events-none absolute top-6 left-1/2 -translate-x-1/2 text-center z-10">
         <h2 className="text-white text-2xl font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>Featured Project</h2>
         <p className="text-gray-300 text-sm">Tackle — Your solution to pricing intelligently</p>
       </div>
-      {/* After takeover ends, content continues normally (spacer not needed due to 300vh) */}
     </section>
   );
 };
