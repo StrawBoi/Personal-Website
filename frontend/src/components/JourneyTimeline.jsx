@@ -24,6 +24,33 @@ const JourneyTimeline = () => {
   const [groupIndex, setGroupIndex] = useState(0); // float for smoothing
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
+  // Track precise mouse position to resolve stuck hover
+  const cardRefs = useRef([]);
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!containerRef.current) return;
+      const idx = cardRefs.current.findIndex((el) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      });
+      if (idx !== -1) setHoveredIndex(idx);
+      else setHoveredIndex(null);
+    };
+    const onLeave = () => setHoveredIndex(null);
+    const el = containerRef.current;
+    if (el) {
+      el.addEventListener('mousemove', onMove);
+      el.addEventListener('mouseleave', onLeave);
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener('mousemove', onMove);
+        el.removeEventListener('mouseleave', onLeave);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (p) => {
       const target = Math.round(p * (groupCount - 1)); // intended group
@@ -40,32 +67,31 @@ const JourneyTimeline = () => {
     const dist = Math.abs(cardGroup - groupIndex);
 
     // Depth tiers based on distance to current focus group (increase background blur)
-    let z = -180, scale = 0.84, blur = 5.5, alpha = 0.42; // more blur for background
+    let z = -200, scale = 0.82, blur = 6.5, alpha = 0.4; // stronger background blur and smaller size
     if (dist < 0.33) { // main trio (focused)
-      z = 200; scale = 1.0; blur = 0; alpha = 1;
+      z = 180; scale = 0.96; blur = 0; alpha = 1;
     } else if (dist < 1.1) { // neighboring trio (medium)
-      z = 80; scale = 0.95; blur = 2; alpha = 0.72;
+      z = 60; scale = 0.9; blur = 2.2; alpha = 0.7;
     }
 
     const isHovered = hoveredIndex === i;
-    if (isHovered) { z = 300; scale = 1.05; blur = 0; alpha = 1; }
+    if (isHovered) { z = 260; scale = 1.0; blur = 0; alpha = 1; }
 
     const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)";
 
     return (
       <div
-        className={`relative w-full md:w-[60%] ${i % 2 === 0 ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
+        ref={(el) => (cardRefs.current[i] = el)}
+        className={`relative w-full md:w-[58%] ${i % 2 === 0 ? "md:mr-10 md:self-end" : "md:ml-10 md:self-start"}`}
         style={{
           transformStyle: "preserve-3d",
           transform: `translateZ(${z}px) scale(${scale}) ${rotate}`,
           transition: "transform 420ms cubic-bezier(0.2,0.7,0,1), filter 280ms ease, opacity 280ms ease, box-shadow 280ms ease",
           filter: blur ? `blur(${blur}px)` : "none",
           opacity: alpha,
-          boxShadow: isHovered ? "0 22px 70px rgba(20,184,166,0.16)" : "none",
+          boxShadow: isHovered ? "0 18px 60px rgba(20,184,166,0.15)" : "none",
           willChange: "transform, filter, opacity",
         }}
-        onMouseEnter={() => setHoveredIndex(i)}
-        onMouseLeave={() => setHoveredIndex(null)}
         data-testid={`journey-card-${i}`}
       >
         {/* Connector from center line to card */}
@@ -88,29 +114,29 @@ const JourneyTimeline = () => {
           aria-hidden
         />
 
-        {/* Glassmorphism card */}
+        {/* Softer, smaller, rounder card */}
         <div
-          className="rounded-2xl p-6 border cursor-pointer min-h-[120px]"
+          className="rounded-3xl p-5 border cursor-pointer min-h-[96px]"
           style={{
             background: "rgba(255,255,255,0.08)",
             backdropFilter: "blur(14px)",
-            border: "1px solid rgba(255,255,255,0.18)",
+            border: "1px solid rgba(255,255,255,0.14)",
           }}
         >
           <div className="flex items-center gap-3">
-            {Icon ? <Icon className="w-6 h-6 text-teal-400" /> : null}
-            <h3 className="text-white text-lg md:text-xl font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
+            {Icon ? <Icon className="w-5 h-5 text-teal-400" /> : null}
+            <h3 className="text-white text-base md:text-lg font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
           </div>
-          <p className="text-gray-300 mt-2" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
+          <p className="text-gray-300 mt-1 text-sm md:text-base" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
         </div>
       </div>
     );
   };
 
   return (
-    <section id="story" className="relative py-28" data-testid="section-journey">
+    <section id="story" className="relative py-24" data-testid="section-journey">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: "Inter, sans-serif" }}>My Journey</h2>
           <p
             className="mt-5 max-w-3xl mx-auto text-gray-300 text-lg md:text-xl leading-relaxed"
@@ -121,14 +147,14 @@ const JourneyTimeline = () => {
           </p>
         </div>
 
-        {/* Depth container with stronger 3D concave effect */}
+        {/* Depth container with perspective for 3D concave effect */}
         <div ref={containerRef} className="relative flex flex-col items-center" style={{ perspective: "1600px" }}>
           {/* Center vertical line */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px" aria-hidden>
             <div className="w-px h-full bg-gradient-to-b from-emerald-400 via-amber-300 to-blue-400 opacity-70" />
           </div>
 
-          <div className="grid grid-cols-1 gap-8 w-full max-w-6xl">
+          <div className="grid grid-cols-1 gap-6 w-full max-w-6xl">
             {items.map((it, i) => {
               const Icon = it.icon;
               return (
@@ -139,7 +165,7 @@ const JourneyTimeline = () => {
         </div>
       </div>
 
-      {/* Overlay side panel appears on hover (right overlay), matching screenshot style */}
+      {/* Right overlay panel for job description (not interfering with hover detection) */}
       <AnimatePresence>
         {hoveredIndex !== null && (
           <motion.aside
@@ -147,10 +173,8 @@ const JourneyTimeline = () => {
             initial={{ x: 40, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 40, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed top-20 right-6 bottom-6 w-[520px] bg-black/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_80px_rgba(0,0,0,0.45)] z-50 overflow-auto"
-            onMouseEnter={() => setHoveredIndex(hoveredIndex)}
-            onMouseLeave={() => setHoveredIndex(null)}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="fixed top-20 right-6 bottom-6 w-[520px] bg-black/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_80px_rgba(0,0,0,0.45)] z-50 overflow-auto pointer-events-auto"
             data-testid="journey-overlay-panel"
           >
             <div className="p-6 space-y-6">

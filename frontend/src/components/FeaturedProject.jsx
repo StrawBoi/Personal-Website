@@ -3,29 +3,29 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 
 // Tackle project video
 const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
+const TECH_IMG = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/d6jidwc1_image.png"; // provided layer
 
-// Simple techy background pattern (transparent-ish)
-const TechBack = () => (
+// Techy overlay background
+const TechLayer = () => (
   <div className="absolute inset-0 opacity-60 pointer-events-none" style={{
-    backgroundImage: `radial-gradient(circle at 20% 30%, rgba(20,184,166,0.06) 0%, transparent 40%),
-                      radial-gradient(circle at 80% 70%, rgba(56,189,248,0.06) 0%, transparent 45%),
-                      linear-gradient(45deg, rgba(255,255,255,0.04) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.04) 75%, transparent 75%, transparent)` ,
-    backgroundSize: '160px 160px, 160px 160px, 40px 40px'
+    backgroundImage: `url(${TECH_IMG}), radial-gradient(circle at 20% 30%, rgba(20,184,166,0.06) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(56,189,248,0.06) 0%, transparent 45%)`,
+    backgroundSize: 'cover, 160px 160px, 160px 160px',
+    backgroundPosition: 'center, center, center'
   }} />
 );
 
 const FlipCard = ({ title, bullets, Icon }) => (
-  <div className="relative [transform-style:preserve-3d] group h-[220px] rounded-2xl border border-white/10 overflow-hidden">
+  <div className="relative [transform-style:preserve-3d] group h-[220px] rounded-2xl border border-white/10 overflow-hidden" style={{ perspective: '1000px' }}>
     {/* Back face (default) */}
-    <div className="absolute inset-0 bg-black/50 [backface-visibility:hidden] [transform:rotateY(0deg)] flex items-center justify-center">
-      <TechBack />
-      <div className="text-white/80 text-lg font-medium flex items-center gap-2 z-10">
-        {Icon ? <Icon /> : null}
+    <div className="absolute inset-0 bg-black/40 [backface-visibility:hidden] [transform:rotateY(0deg)] flex items-center justify-center">
+      <TechLayer />
+      <div className="text-white text-lg md:text-xl font-bold z-10 text-center px-6">
+        {Icon ? <div className="mx-auto mb-2" style={{ opacity: 0.85 }}>{<Icon />}</div> : null}
         <span>{title}</span>
       </div>
     </div>
     {/* Front face (info) */}
-    <div className="absolute inset-0 bg-black/80 [backface-visibility:hidden] [transform:rotateY(180deg)] flex items-center" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+    <div className="absolute inset-0 bg-black/80 [backface-visibility:hidden] [transform:rotateY(180deg)] flex items-center">
       <div className="p-5">
         <h5 className="text-white font-semibold mb-2">{title}</h5>
         <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
@@ -38,7 +38,7 @@ const FlipCard = ({ title, bullets, Icon }) => (
   </div>
 );
 
-// Minimal inline SVG icons (transparent-friendly)
+// Inline SVG icons
 const IconData = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
 const IconViz = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 18V6m5 12V9m5 9V4m5 14V12" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
 const IconAI = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" stroke="rgba(20,184,166,0.9)" strokeWidth="2"/><path d="M8 12h8M12 8v8" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
@@ -72,41 +72,23 @@ const FeaturedProject = () => {
         </motion.div>
       </div>
 
-      {/* After takeover: spacing + question + flip cards */}
-      <div className="container mx-auto px-6 mt-24 md:mt-28" data-testid="post-video-content">
+      {/* After takeover: spacing + question + flip cards with tech layer */}
+      <div className="container mx-auto px-6 mt-24 md:mt-28" data-testid="post-video-content" style={{ perspective: '1000px' }}>
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6, ease: 'easeOut' }} className="max-w-5xl mx-auto text-center mb-12">
-          <h3 className="text-white text-xl md:text-2xl font-medium">
+          <h3 className="text-white text-xl md:text-2xl font-bold">
             How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
           </h3>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          <FlipCard
-            title="Module 1: Data Collection Core"
-            bullets={["Automated product price & stock tracking from URLs", "Continuous updates for real-time market view"]}
-            Icon={IconData}
-          />
-          <FlipCard
-            title="Module 2: Analysis & Visualization Hub"
-            bullets={["Historical Price Trend (line)", "Competitor Price Comparison (bar)", "Category Trend (area)", "Price vs Popularity (scatter)"]}
-            Icon={IconViz}
-          />
-          <FlipCard
-            title="Module 3: AI Insight Layer"
-            bullets={["Anomaly detection", "Trend analysis & simple forecasting", "Actionable recommendations"]}
-            Icon={IconAI}
-          />
-          <FlipCard
-            title="Module 4: User-Centric Tools"
-            bullets={["User accounts & saved products", "Smart alerts & email notifications", "CSV data export"]}
-            Icon={IconTools}
-          />
+          <FlipCard title="Module 1: Data Collection Core" bullets={["Automated product price & stock tracking from URLs", "Continuous updates for real-time market view"]} Icon={IconData} />
+          <FlipCard title="Module 2: Analysis & Visualization Hub" bullets={["Historical Price Trend (line)", "Competitor Comparison (bar)", "Category Trend (area)", "Price vs Popularity (scatter)"]} Icon={IconViz} />
+          <FlipCard title="Module 3: AI Insight Layer" bullets={["Anomaly detection", "Trend analysis & forecasting", "Actionable recommendations"]} Icon={IconAI} />
+          <FlipCard title="Module 4: User-Centric Tools" bullets={["User accounts & saved products", "Smart alerts & email notifications", "CSV data export"]} Icon={IconTools} />
         </div>
 
         <div className="flex justify-center mt-10">
-          <a href="#contact" className="px-5 py-2 rounded border border-teal-500 text-white hover:bg-teal-500/20" data-testid="cta-learn-more">
-            Learn more / Get in touch
-          </a>
+          <a href="#contact" className="px-5 py-2 rounded border border-teal-500 text-white hover:bg-teal-500/20" data-testid="cta-learn-more">Learn more / Get in touch</a>
         </div>
       </div>
     </section>

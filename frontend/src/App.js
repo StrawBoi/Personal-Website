@@ -58,19 +58,32 @@ function App() {
         <section id="contact" data-testid="section-contact"><Contact /></section>
       </main>
 
-      <footer className="bg-black border-t border-white/10 py-10" data-testid="footer">
+      <footer className="bg-black border-t border-white/10 py-14" data-testid="footer">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
             <div>
-              <p className="text-white font-semibold text-lg">Get in touch</p>
-              <div className="mt-2 flex items-center gap-6 text-gray-300">
-                <a href="mailto:Ahmed.ha.mahmoud@outlook.com" className="hover:text-teal-400">Email</a>
-                <a href="tel:+32490364804" className="hover:text-teal-400">Phone</a>
-                <a href="https://www.linkedin.com/in/ahmed-mohsen-hanafy/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-400">LinkedIn</a>
-              </div>
+              <p className="text-white font-semibold text-lg">About</p>
+              <p className="text-gray-400 mt-2">Creative technologist bridging customer insight, engineering and strategy to deliver measurable outcomes.</p>
             </div>
-            <div className="text-gray-500 text-sm">© 2025 Ahmed Mostafa. Crafted with passion and precision.</div>
+            <div>
+              <p className="text-white font-semibold text-lg">Contact</p>
+              <ul className="mt-2 space-y-1 text-gray-300">
+                <li><a href="mailto:Ahmed.ha.mahmoud@outlook.com" className="hover:text-teal-400">Ahmed.ha.mahmoud@outlook.com</a></li>
+                <li><a href="tel:+32490364804" className="hover:text-teal-400">+32 490 36 48 04</a></li>
+                <li><a href="https://www.linkedin.com/in/ahmed-mohsen-hanafy/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-400">linkedin.com/in/ahmed-mohsen-hanafy</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-white font-semibold text-lg">Links</p>
+              <ul className="mt-2 space-y-1 text-gray-300">
+                <li><a href="#story" className="hover:text-teal-400">My Journey</a></li>
+                <li><a href="#featured-project" className="hover:text-teal-400">Featured Project</a></li>
+                <li><a href="#portfolio" className="hover:text-teal-400">Case Studies</a></li>
+                <li><a href="#contact" className="hover:text-teal-400">Contact</a></li>
+              </ul>
+            </div>
           </div>
+          <div className="mt-10 text-gray-600 text-xs">© 2025 Ahmed Mostafa. Crafted with passion and precision.</div>
         </div>
       </footer>
     </div>
