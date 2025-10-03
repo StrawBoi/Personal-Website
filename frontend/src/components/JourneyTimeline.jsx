@@ -20,43 +20,49 @@ const JourneyTimeline = () => {
   useInView(containerRef, { margin: "-20% 0px -20% 0px" });
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
 
-  // Hard snap per row of 3
+  // Softer snap per row of 3 using eased lerp
   const groupCount = Math.ceil(items.length / 3);
-  const [groupIndex, setGroupIndex] = useState(0);
+  const [groupIndex, setGroupIndex] = useState(0); // float for smoothing
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (p) => {
-      const snapped = Math.round(p * (groupCount - 1));
-      setGroupIndex(Math.max(0, Math.min(groupCount - 1, snapped)));
+      const target = Math.round(p * (groupCount - 1)); // intended group
+      setGroupIndex((prev) => {
+        const delta = target - prev;
+        // ease toward target (softer snap)
+        return Math.max(0, Math.min(groupCount - 1, prev + delta * 0.25));
+      });
     });
     return () => unsub && unsub();
   }, [scrollYProgress, groupCount]);
 
   const Card = ({ i, title, period, Icon }) => {
-    const start = groupIndex * 3;
-    const end = start + 2;
-    const inFocusedGroup = i >= start && i <= end;
+    const cardGroup = Math.floor(i / 3);
+    const dist = Math.abs(cardGroup - groupIndex);
+
+    // Depth tiers based on distance to current focus group (softer than hard snap)
+    let z = -160, scale = 0.86, blur = 3.2, alpha = 0.48;
+    if (dist < 0.33) { // main trio
+      z = 200; scale = 1.0; blur = 0; alpha = 1;
+    } else if (dist < 1.1) { // neighboring trio
+      z = 80; scale = 0.95; blur = 1.2; alpha = 0.75;
+    }
+
     const isHovered = hoveredIndex === i;
+    if (isHovered) { z = 300; scale = 1.04; blur = 0; alpha = 1; }
 
-    // Stronger concave: foreground pops, background recedes
-    const depthTransform = isHovered
-      ? "translateZ(300px) scale(1.04)"
-      : inFocusedGroup
-      ? "translateZ(200px) scale(1.0)"
-      : "translateZ(-160px) scale(0.86)";
-
-    const rotate = i % 2 === 0 ? "rotateY(-11deg)" : "rotateY(11deg)";
+    const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)";
 
     return (
       <div
         className={`relative w-full md:w-[66%] ${i % 2 === 0 ? "md:mr-16 md:self-end" : "md:ml-16 md:self-start"}`}
         style={{
           transformStyle: "preserve-3d",
-          transform: `${depthTransform} ${rotate}`,
+          transform: `translateZ(${z}px) scale(${scale}) ${rotate}`,
           transition: "transform 420ms cubic-bezier(0.2,0.7,0,1), filter 280ms ease, opacity 280ms ease, box-shadow 280ms ease",
-          filter: isHovered ? "none" : inFocusedGroup ? "none" : "blur(3.2px)",
-          opacity: isHovered ? 1 : inFocusedGroup ? 1 : 0.48,
+          filter: blur ? `blur(${blur}px)` : "none",
+          opacity: alpha,
           boxShadow: isHovered ? "0 22px 70px rgba(20,184,166,0.16)" : "none",
           willChange: "transform, filter, opacity",
         }}
