@@ -47,15 +47,31 @@ const Contact = () => {
 
   const [form, setForm] = React.useState({ name: '', email: '', message: '' });
   const [status, setStatus] = React.useState(null);
+  const [submitting, setSubmitting] = React.useState(false);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       setStatus({ ok: false, msg: 'Please fill out all fields.' });
       return;
     }
-    // TODO: Wire to backend /api/contact
-    setTimeout(() => setStatus({ ok: true, msg: 'Thanks! Your message has been received.' }), 400);
+    try {
+      setSubmitting(true);
+      const base = process.env.REACT_APP_BACKEND_URL || '/api';
+      const res = await fetch(`${base}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.detail || 'Failed to send');
+      setStatus({ ok: true, msg: 'Thanks! Your message has been received.' });
+      setForm({ name: '', email: '', message: '' });
+    } catch (err) {
+      setStatus({ ok: false, msg: err.message || 'Something went wrong.' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -118,8 +134,8 @@ const Contact = () => {
               />
             </div>
             <div className="flex items-center justify-between">
-              <button type="submit" className="px-5 py-2 rounded border border-teal-500 text-white hover:bg-teal-500/20" data-testid="contact-submit">
-                Send Message
+              <button type="submit" disabled={submitting} className="px-5 py-2 rounded border border-teal-500 text-white hover:bg-teal-500/20 disabled:opacity-60" data-testid="contact-submit">
+                {submitting ? 'Sending...' : 'Send Message'}
               </button>
               {status && (
                 <span className={status.ok ? 'text-teal-400' : 'text-amber-400'} data-testid="contact-status">
