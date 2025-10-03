@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 
+// Four key roles for the refined vertical timeline
 const items = [
   { title: "Creative Director | EcoNarrate", period: "APRIL 2024 – PRESENT" },
   { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023" },
@@ -9,17 +10,40 @@ const items = [
 ];
 
 const Card = ({ i, title, period, progress }) => {
+  // Reveal the card as the line "reaches" its position
   const triggerPoint = (i + 1) / (items.length + 0.5);
-  const opacity = useTransform(progress, [triggerPoint - 0.1, triggerPoint], [0, 1]);
-  const y = useTransform(progress, [triggerPoint - 0.1, triggerPoint], [30, 0]);
-  const x = useTransform(progress, [triggerPoint - 0.1, triggerPoint], [i % 2 === 0 ? -30 : 30, 0]);
+  const opacity = useTransform(progress, [triggerPoint - 0.12, triggerPoint], [0, 1]);
+  const y = useTransform(progress, [triggerPoint - 0.12, triggerPoint], [30, 0]);
+  const x = useTransform(progress, [triggerPoint - 0.12, triggerPoint], [i % 2 === 0 ? -36 : 36, 0]);
+  const isLeft = i % 2 === 0; // left side cards
 
   return (
     <motion.div
-      className={`relative w-full md:w-[46%] ${i % 2 === 0 ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
+      className={`relative w-full md:w-[46%] ${isLeft ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
       style={{ opacity, y, x }}
       data-testid={`journey-card-${i}`}
     >
+      {/* Connector from center line to card */}
+      <div
+        className={`hidden md:block absolute top-1/2 ${isLeft ? "right-full" : "left-full"} w-10 h-0.5 -translate-y-1/2`}
+        style={{
+          background: "linear-gradient(90deg, rgba(20,184,166,0.0), rgba(20,184,166,0.7))",
+          transform: isLeft ? "translateY(-50%)" : "translateY(-50%) rotate(180deg)",
+        }}
+        aria-hidden
+      />
+      {/* Connector dot near the center line */}
+      <div
+        className={`hidden md:block absolute top-1/2 ${isLeft ? "-right-2" : "-left-2"} w-3 h-3 rounded-full`}
+        style={{
+          background: "radial-gradient(circle, #34d399 0%, #10b981 60%, rgba(16,185,129,0.2) 100%)",
+          boxShadow: "0 0 10px rgba(16,185,129,0.6)",
+          transform: "translateY(-50%)",
+        }}
+        aria-hidden
+      />
+
+      {/* Glassmorphism card */}
       <div
         className="rounded-2xl p-5 border"
         style={{
