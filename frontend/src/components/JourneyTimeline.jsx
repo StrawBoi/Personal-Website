@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView, useScroll } from "framer-motion";
-import { Lightbulb, Cpu, LineChart, GraduationCap, Briefcase, Wrench, Rocket, Shield } from "lucide-react";
+import { Lightbulb, Cpu, LineChart, GraduationCap, Briefcase, Wrench, Rocket, Shield, X } from "lucide-react";
 
 // Expanded roles for a larger cohesive journey
 const items = [
@@ -8,7 +8,6 @@ const items = [
   { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023", icon: Cpu },
   { title: "SEO Optimization and Sales Representative | Wisdek", period: "JANUARY 2017 – DECEMBER 2017", icon: LineChart },
   { title: "Subject Matter Expert | Altice One", period: "2015 – 2016", icon: GraduationCap },
-  // Added experiences (update content later as needed)
   { title: "Business Consultant | Ghasa Marine", period: "MAY 2023 – DECEMBER 2023", icon: Briefcase },
   { title: "Operations Lead | [Add Company]", period: "[Add Period]", icon: Wrench },
   { title: "Product Strategist | [Add Company]", period: "[Add Period]", icon: Rocket },
@@ -53,11 +52,9 @@ const JourneyTimeline = () => {
 
     const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)";
 
-    const side = i % 2 === 0 ? 'right' : 'left';
-
     return (
       <div
-        className={`relative w-full md:w-[66%] ${i % 2 === 0 ? "md:mr-16 md:self-end" : "md:ml-16 md:self-start"}`}
+        className={`relative w-full md:w-[60%] ${i % 2 === 0 ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
         style={{
           transformStyle: "preserve-3d",
           transform: `translateZ(${z}px) scale(${scale}) ${rotate}`,
@@ -93,7 +90,7 @@ const JourneyTimeline = () => {
 
         {/* Glassmorphism card */}
         <div
-          className="rounded-2xl p-7 border cursor-pointer min-h-[112px]"
+          className="rounded-2xl p-6 border cursor-pointer min-h-[120px]"
           style={{
             background: "rgba(255,255,255,0.08)",
             backdropFilter: "blur(14px)",
@@ -102,50 +99,10 @@ const JourneyTimeline = () => {
         >
           <div className="flex items-center gap-3">
             {Icon ? <Icon className="w-6 h-6 text-teal-400" /> : null}
-            <h3 className="text-white text-xl font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
+            <h3 className="text-white text-lg md:text-xl font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
           </div>
           <p className="text-gray-300 mt-2" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
         </div>
-
-        {/* Side panel on hover from the same side as the card */}
-        <AnimatePresence>
-          {isHovered && (
-            <motion.aside
-              key={`panel-${i}`}
-              initial={{ x: side === 'right' ? '100%' : '-100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: side === 'right' ? '100%' : '-100%', opacity: 0 }}
-              transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
-              className={`fixed top-20 bottom-4 w-full md:w-[520px] ${side === 'right' ? 'right-0' : 'left-0'} bg-black/95 border-white/10 border z-50 overflow-auto`}
-              onMouseEnter={() => setHoveredIndex(i)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              data-testid={`journey-hover-panel-${i}`}
-            >
-              <div className="p-6 space-y-6">
-                <div>
-                  <h4 className="text-white text-xl font-semibold">{title}</h4>
-                  <p className="text-gray-400" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{period}</p>
-                </div>
-                <div>
-                  <h5 className="text-white font-semibold">Job Description</h5>
-                  <p className="text-gray-300 mt-1">Placeholder description for the role; replace with detailed responsibilities and scope.</p>
-                </div>
-                <div>
-                  <h5 className="text-white font-semibold">Key Achievement</h5>
-                  <p className="text-gray-300 mt-1">Placeholder achievement highlighting measurable business outcomes.</p>
-                </div>
-                <div>
-                  <h5 className="text-white font-semibold">Skills Learnt</h5>
-                  <ul className="text-gray-300 list-disc pl-5 mt-1 space-y-1">
-                    <li>Placeholder skill 1</li>
-                    <li>Placeholder skill 2</li>
-                    <li>Placeholder skill 3</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
       </div>
     );
   };
@@ -171,7 +128,7 @@ const JourneyTimeline = () => {
             <div className="w-px h-full bg-gradient-to-b from-emerald-400 via-amber-300 to-blue-400 opacity-70" />
           </div>
 
-          <div className="grid grid-cols-1 gap-12 w-full max-w-6xl">
+          <div className="grid grid-cols-1 gap-8 w-full max-w-6xl">
             {items.map((it, i) => {
               const Icon = it.icon;
               return (
@@ -181,6 +138,51 @@ const JourneyTimeline = () => {
           </div>
         </div>
       </div>
+
+      {/* Overlay side panel appears on hover (right overlay), matching screenshot style */}
+      <AnimatePresence>
+        {hoveredIndex !== null && (
+          <motion.aside
+            key="journey-overlay"
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 40, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="fixed top-20 right-6 bottom-6 w-[520px] bg-black/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_80px_rgba(0,0,0,0.45)] z-50 overflow-auto"
+            onMouseEnter={() => setHoveredIndex(hoveredIndex)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            data-testid="journey-overlay-panel"
+          >
+            <div className="p-6 space-y-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="text-white text-xl font-semibold">{items[hoveredIndex].title}</h4>
+                  <p className="text-gray-400" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{items[hoveredIndex].period}</p>
+                </div>
+                <button aria-label="close" className="text-gray-400 hover:text-white" onClick={() => setHoveredIndex(null)}>
+                  <X size={20} />
+                </button>
+              </div>
+              <div>
+                <h5 className="text-white font-semibold">Job Description</h5>
+                <p className="text-gray-300 mt-1">Placeholder description for the role; replace with detailed responsibilities and scope.</p>
+              </div>
+              <div>
+                <h5 className="text-white font-semibold">Key Achievement</h5>
+                <p className="text-gray-300 mt-1">Placeholder achievement highlighting measurable business outcomes.</p>
+              </div>
+              <div>
+                <h5 className="text-white font-semibold">Skills Learnt</h5>
+                <ul className="text-gray-300 list-disc pl-5 mt-1 space-y-1">
+                  <li>Placeholder skill 1</li>
+                  <li>Placeholder skill 2</li>
+                  <li>Placeholder skill 3</li>
+                </ul>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

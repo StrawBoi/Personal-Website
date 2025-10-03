@@ -6,6 +6,7 @@ import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
+import GlobalBackground from "./components/GlobalBackground";
 import DataStream from "./components/DataStream";
 
 const scrollStyles = `
@@ -24,6 +25,7 @@ function App() {
 
   return (
     <div className="App" data-testid="app-root">
+      <GlobalBackground />
       <style>{scrollStyles}</style>
 
       <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
@@ -44,10 +46,10 @@ function App() {
         </div>
       </nav>
 
-      {/* Main is relative so DataStream beams can anchor below hero */}
-      <main ref={mainRef} className="relative" data-testid="main-content">
-        <DataStream mainRef={mainRef} sectionIds={sectionIds} />
+      {/* Left-side navigational data-stream */}
+      <DataStream mainRef={mainRef} sectionIds={sectionIds} />
 
+      <main ref={mainRef} className="relative" data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
         <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
@@ -56,12 +58,18 @@ function App() {
         <section id="contact" data-testid="section-contact"><Contact /></section>
       </main>
 
-      <footer className="bg-black border-t border-white/10 py-12" data-testid="footer">
+      <footer className="bg-black border-t border-white/10 py-10" data-testid="footer">
         <div className="container mx-auto px-6">
-          <div className="text-center">
-            <div className="border-t border-white/10 pt-4">
-              <p className="text-gray-500 text-sm">© 2025 Ahmed Mostafa. Crafted with passion and precision.</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <p className="text-white font-semibold text-lg">Get in touch</p>
+              <div className="mt-2 flex items-center gap-6 text-gray-300">
+                <a href="mailto:Ahmed.ha.mahmoud@outlook.com" className="hover:text-teal-400">Email</a>
+                <a href="tel:+32490364804" className="hover:text-teal-400">Phone</a>
+                <a href="https://www.linkedin.com/in/ahmed-mohsen-hanafy/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-400">LinkedIn</a>
+              </div>
             </div>
+            <div className="text-gray-500 text-sm">© 2025 Ahmed Mostafa. Crafted with passion and precision.</div>
           </div>
         </div>
       </footer>
