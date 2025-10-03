@@ -20,42 +20,44 @@ const JourneyTimeline = () => {
   useInView(containerRef, { margin: "-20% 0px -20% 0px" });
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
 
-  // Determine which trio of cards should be focused based on scroll progress
-  const [focusIndex, setFocusIndex] = useState(0);
+  // Hard snap per row of 3
+  const groupCount = Math.ceil(items.length / 3);
+  const [groupIndex, setGroupIndex] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   useEffect(() => {
     const unsub = scrollYProgress.on("change", (p) => {
-      const idx = Math.max(0, Math.min(items.length - 1, Math.round(p * (items.length - 1))));
-      setFocusIndex(idx);
+      const snapped = Math.round(p * (groupCount - 1));
+      setGroupIndex(Math.max(0, Math.min(groupCount - 1, snapped)));
     });
     return () => unsub && unsub();
-  }, [scrollYProgress]);
+  }, [scrollYProgress, groupCount]);
 
-  // Card component with stronger concave depth + hover lift and side panel
   const Card = ({ i, title, period, Icon }) => {
-    const isFocusedTrio = Math.abs(i - focusIndex) <= 1; // center trio focus
+    const start = groupIndex * 3;
+    const end = start + 2;
+    const inFocusedGroup = i >= start && i <= end;
     const isHovered = hoveredIndex === i;
 
-    // Stronger concave: foreground pops, background recedes more
+    // Stronger concave: foreground pops, background recedes
     const depthTransform = isHovered
-      ? "translateZ(260px) scale(1.03)"
-      : isFocusedTrio
-      ? "translateZ(170px) scale(1.0)"
-      : "translateZ(-140px) scale(0.88)";
+      ? "translateZ(300px) scale(1.04)"
+      : inFocusedGroup
+      ? "translateZ(200px) scale(1.0)"
+      : "translateZ(-160px) scale(0.86)";
 
-    const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)"; // more pronounced
+    const rotate = i % 2 === 0 ? "rotateY(-11deg)" : "rotateY(11deg)";
 
     return (
       <div
-        className={`relative w-full md:w-[64%] ${i % 2 === 0 ? "md:mr-14 md:self-end" : "md:ml-14 md:self-start"}`}
+        className={`relative w-full md:w-[66%] ${i % 2 === 0 ? "md:mr-16 md:self-end" : "md:ml-16 md:self-start"}`}
         style={{
           transformStyle: "preserve-3d",
           transform: `${depthTransform} ${rotate}`,
-          transition: "transform 420ms ease, filter 280ms ease, opacity 280ms ease, box-shadow 280ms ease",
-          filter: isHovered ? "none" : isFocusedTrio ? "none" : "blur(3px)",
-          opacity: isHovered ? 1 : isFocusedTrio ? 1 : 0.5,
-          boxShadow: isHovered ? "0 20px 60px rgba(20,184,166,0.15)" : "none",
+          transition: "transform 420ms cubic-bezier(0.2,0.7,0,1), filter 280ms ease, opacity 280ms ease, box-shadow 280ms ease",
+          filter: isHovered ? "none" : inFocusedGroup ? "none" : "blur(3.2px)",
+          opacity: isHovered ? 1 : inFocusedGroup ? 1 : 0.48,
+          boxShadow: isHovered ? "0 22px 70px rgba(20,184,166,0.16)" : "none",
           willChange: "transform, filter, opacity",
         }}
         onMouseEnter={() => setHoveredIndex(i)}
@@ -82,7 +84,7 @@ const JourneyTimeline = () => {
           aria-hidden
         />
 
-        {/* Glassmorphism card (larger) */}
+        {/* Glassmorphism card */}
         <div
           className="rounded-2xl p-7 border cursor-pointer"
           style={{
@@ -115,8 +117,8 @@ const JourneyTimeline = () => {
           </p>
         </div>
 
-        {/* Depth container with perspective for stronger 3D concave effect */}
-        <div ref={containerRef} className="relative flex flex-col items-center" style={{ perspective: "1400px" }}>
+        {/* Depth container with stronger 3D concave effect */}
+        <div ref={containerRef} className="relative flex flex-col items-center" style={{ perspective: "1600px" }}>
           {/* Center vertical line */}
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px" aria-hidden>
             <div className="w-px h-full bg-gradient-to-b from-emerald-400 via-amber-300 to-blue-400 opacity-70" />
@@ -132,46 +134,6 @@ const JourneyTimeline = () => {
           </div>
         </div>
       </div>
-
-      {/* Hover-to-reveal Side Panel (restored and improved) */}
-      <AnimatePresence>
-        {hoveredIndex !== null && (
-          <motion.aside
-            key="journey-sidepanel"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.35, ease: 'easeOut' }}
-            className="fixed top-16 right-0 bottom-0 w-full md:w-[560px] bg-black/95 border-l border-white/10 z-50 overflow-auto"
-            data-testid="journey-hover-panel"
-            onMouseEnter={() => setHoveredIndex(hoveredIndex)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            <div className="p-7 space-y-7">
-              <div>
-                <h3 className="text-2xl font-semibold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>{items[hoveredIndex].title}</h3>
-                <p className="text-gray-400 mt-1" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{items[hoveredIndex].period}</p>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold text-lg">Job Description</h4>
-                <p className="text-gray-300 mt-2">Placeholder description for the role detailing responsibilities and core areas of ownership. Replace this with your actual job description.</p>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold text-lg">Key Achievement</h4>
-                <p className="text-gray-300 mt-2">Placeholder achievement detailing a specific measurable impact or business outcome delivered in this role.</p>
-              </div>
-              <div>
-                <h4 className="text-white font-semibold text-lg">Skills Learnt</h4>
-                <ul className="text-gray-300 list-disc pl-5 mt-2 space-y-1">
-                  <li>Placeholder skill 1</li>
-                  <li>Placeholder skill 2</li>
-                  <li>Placeholder skill 3</li>
-                </ul>
-              </div>
-            </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
