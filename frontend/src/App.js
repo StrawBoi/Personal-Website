@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
-import JourneyTimeline from "./components/JourneyTimeline";
+import MyJourneyCoverflow from "./components/MyJourneyCoverflow";
 import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
@@ -17,6 +17,8 @@ const scrollStyles = `
   ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #10b981, #0891b2); border-radius: 4px; }
   ::selection { background: rgba(16,185,129,0.3); color: white; }
   section { position: relative; overflow: hidden; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 
 function App() {
@@ -46,12 +48,11 @@ function App() {
         </div>
       </nav>
 
-      {/* Left-side navigational data-stream */}
       <DataStream mainRef={mainRef} sectionIds={sectionIds} />
 
       <main ref={mainRef} className="relative" data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
-        <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
+        <section id="story" data-testid="section-journey"><MyJourneyCoverflow /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
         <section id="skills" data-testid="section-toolkit"><Toolkit /></section>
