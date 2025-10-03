@@ -41,16 +41,16 @@ const JourneyTimeline = () => {
     const cardGroup = Math.floor(i / 3);
     const dist = Math.abs(cardGroup - groupIndex);
 
-    // Depth tiers based on distance to current focus group (softer than hard snap)
-    let z = -160, scale = 0.86, blur = 3.2, alpha = 0.48;
-    if (dist < 0.33) { // main trio
+    // Depth tiers based on distance to current focus group (increase background blur)
+    let z = -180, scale = 0.84, blur = 5.5, alpha = 0.42; // more blur for background
+    if (dist < 0.33) { // main trio (focused)
       z = 200; scale = 1.0; blur = 0; alpha = 1;
-    } else if (dist < 1.1) { // neighboring trio
-      z = 80; scale = 0.95; blur = 1.2; alpha = 0.75;
+    } else if (dist < 1.1) { // neighboring trio (medium)
+      z = 80; scale = 0.95; blur = 2; alpha = 0.72;
     }
 
     const isHovered = hoveredIndex === i;
-    if (isHovered) { z = 300; scale = 1.04; blur = 0; alpha = 1; }
+    if (isHovered) { z = 300; scale = 1.05; blur = 0; alpha = 1; }
 
     const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)";
 
