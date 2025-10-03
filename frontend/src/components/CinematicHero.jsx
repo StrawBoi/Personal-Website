@@ -19,7 +19,6 @@ const useStars = (count, { minSize = 1, maxSize = 3, minOpacity = 0.2, maxOpacit
       });
     }
     return stars;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 
