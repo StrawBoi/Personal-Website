@@ -34,7 +34,7 @@ const FeaturedProject = () => {
           className="max-w-[1920px] aspect-video overflow-hidden border border-white/10 bg-black relative"
           data-testid="featured-video-frame"
         >
-          {/* Constant 15-20% dim layer */}
+          {/* Constant 20% dim layer */}
           <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
 
           <video
@@ -61,24 +61,24 @@ const FeaturedProject = () => {
       </div>
 
       {/* After the parallax takeover ends: headline bump and feature cards */}
-      <div className="container mx-auto px-6 -mt-10 md:-mt-16" data-testid="post-video-content">
+      <div className="container mx-auto px-6 mt-24 md:mt-28" data-testid="post-video-content">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="max-w-4xl mx-auto text-center mb-10"
+          className="max-w-5xl mx-auto text-center mb-10"
         >
           <h3 className="text-white text-xl md:text-2xl font-medium">
-            How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
+            ✨ How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
           </h3>
         </motion.div>
 
-        {/* Feature cards summarizing modules */}
+        {/* Feature cards summarizing modules with transparent-like emojis (unicode, render on transparent) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {/* Module 1 */}
           <div className="rounded-2xl p-6 border" style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.15)' }}>
-            <h4 className="text-white text-lg font-semibold">Module 1: Data Collection Core</h4>
+            <h4 className="text-white text-lg font-semibold">🛰️ Module 1: Data Collection Core</h4>
             <ul className="text-gray-300 mt-2 list-disc pl-5 space-y-1">
               <li>Automated tracking of product price and stock from given URLs</li>
               <li>Continuous updates for accurate, real-time market view</li>
@@ -86,7 +86,7 @@ const FeaturedProject = () => {
           </div>
           {/* Module 2 */}
           <div className="rounded-2xl p-6 border" style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.15)' }}>
-            <h4 className="text-white text-lg font-semibold">Module 2: Analysis & Visualization Hub</h4>
+            <h4 className="text-white text-lg font-semibold">📊 Module 2: Analysis & Visualization Hub</h4>
             <ul className="text-gray-300 mt-2 list-disc pl-5 space-y-1">
               <li>Historical Price Trend (interactive line chart)</li>
               <li>Competitor Price Comparison (bar chart)</li>
@@ -96,7 +96,7 @@ const FeaturedProject = () => {
           </div>
           {/* Module 3 */}
           <div className="rounded-2xl p-6 border" style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.15)' }}>
-            <h4 className="text-white text-lg font-semibold">Module 3: AI Insight Layer</h4>
+            <h4 className="text-white text-lg font-semibold">🤖 Module 3: AI Insight Layer</h4>
             <ul className="text-gray-300 mt-2 list-disc pl-5 space-y-1">
               <li>Anomaly detection for outlier price events</li>
               <li>Trend analysis & simple forecasting</li>
@@ -105,7 +105,7 @@ const FeaturedProject = () => {
           </div>
           {/* Module 4 */}
           <div className="rounded-2xl p-6 border" style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.15)' }}>
-            <h4 className="text-white text-lg font-semibold">Module 4: User-Centric Tools</h4>
+            <h4 className="text-white text-lg font-semibold">🧰 Module 4: User-Centric Tools</h4>
             <ul className="text-gray-300 mt-2 list-disc pl-5 space-y-1">
               <li>Secure user accounts to save tracked products</li>
               <li>Smart alerts & email notifications</li>

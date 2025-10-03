@@ -30,7 +30,6 @@ const JourneyTimeline = () => {
       const target = Math.round(p * (groupCount - 1)); // intended group
       setGroupIndex((prev) => {
         const delta = target - prev;
-        // ease toward target (softer snap)
         return Math.max(0, Math.min(groupCount - 1, prev + delta * 0.25));
       });
     });
@@ -53,6 +52,8 @@ const JourneyTimeline = () => {
     if (isHovered) { z = 300; scale = 1.05; blur = 0; alpha = 1; }
 
     const rotate = i % 2 === 0 ? "rotateY(-10deg)" : "rotateY(10deg)";
+
+    const side = i % 2 === 0 ? 'right' : 'left';
 
     return (
       <div
@@ -92,7 +93,7 @@ const JourneyTimeline = () => {
 
         {/* Glassmorphism card */}
         <div
-          className="rounded-2xl p-7 border cursor-pointer"
+          className="rounded-2xl p-7 border cursor-pointer min-h-[112px]"
           style={{
             background: "rgba(255,255,255,0.08)",
             backdropFilter: "blur(14px)",
@@ -105,6 +106,46 @@ const JourneyTimeline = () => {
           </div>
           <p className="text-gray-300 mt-2" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
         </div>
+
+        {/* Side panel on hover from the same side as the card */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.aside
+              key={`panel-${i}`}
+              initial={{ x: side === 'right' ? '100%' : '-100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: side === 'right' ? '100%' : '-100%', opacity: 0 }}
+              transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
+              className={`fixed top-20 bottom-4 w-full md:w-[520px] ${side === 'right' ? 'right-0' : 'left-0'} bg-black/95 border-white/10 border z-50 overflow-auto`}
+              onMouseEnter={() => setHoveredIndex(i)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              data-testid={`journey-hover-panel-${i}`}
+            >
+              <div className="p-6 space-y-6">
+                <div>
+                  <h4 className="text-white text-xl font-semibold">{title}</h4>
+                  <p className="text-gray-400" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{period}</p>
+                </div>
+                <div>
+                  <h5 className="text-white font-semibold">Job Description</h5>
+                  <p className="text-gray-300 mt-1">Placeholder description for the role; replace with detailed responsibilities and scope.</p>
+                </div>
+                <div>
+                  <h5 className="text-white font-semibold">Key Achievement</h5>
+                  <p className="text-gray-300 mt-1">Placeholder achievement highlighting measurable business outcomes.</p>
+                </div>
+                <div>
+                  <h5 className="text-white font-semibold">Skills Learnt</h5>
+                  <ul className="text-gray-300 list-disc pl-5 mt-1 space-y-1">
+                    <li>Placeholder skill 1</li>
+                    <li>Placeholder skill 2</li>
+                    <li>Placeholder skill 3</li>
+                  </ul>
+                </div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
