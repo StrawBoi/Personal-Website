@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
 import JourneyTimeline from "./components/JourneyTimeline";
+import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
@@ -33,6 +34,7 @@ function App() {
             <div className="hidden md:flex space-x-8" data-testid="navbar-links">
               <a href="#hero" data-testid="nav-home-link" className="text-gray-300 hover:text-white transition-colors duration-300">Home</a>
               <a href="#story" data-testid="nav-story-link" className="text-gray-300 hover:text-white transition-colors duration-300">My Journey</a>
+              <a href="#featured-project" data-testid="nav-featured-link" className="text-gray-300 hover:text-white transition-colors duration-300">Featured Project</a>
               <a href="#portfolio" data-testid="nav-projects-link" className="text-gray-300 hover:text-white transition-colors duration-300">Case Studies</a>
               <a href="#skills" data-testid="nav-skills-link" className="text-gray-300 hover:text-white transition-colors duration-300">Toolkit &amp; Expertise</a>
               <a href="#contact" data-testid="nav-contact-link" className="text-gray-300 hover:text-white transition-colors duration-300">Contact</a>
@@ -44,6 +46,7 @@ function App() {
       <main data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
         <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
+        <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
         <section id="skills" data-testid="section-toolkit"><Toolkit /></section>
         <section id="contact" data-testid="section-contact"><Contact /></section>
