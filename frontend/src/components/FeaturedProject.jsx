@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X } from 'lucide-react';
 
-const DEFAULT_VIDEO = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/bnkz1nlp_A_cinematic_slowmotion_202510012318_6b5ws.mp4";
+// Provided video URL for Price Intelligence Dashboard
+const PRICE_INTEL_VIDEO = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/c4u5i6oh_Tackle%20_%20Pricing%20Intelligence%20-%20Google%20Chrome%202025-10-03%2020-15-02.mp4";
 
-// Extract a poster frame from the video (if CORS allows); fall back to gradient
+// Try to capture a poster frame; fallback to gradient if CORS prevents it
 const usePosterFromVideo = (src) => {
   const [poster, setPoster] = useState(null);
 
@@ -20,9 +21,7 @@ const usePosterFromVideo = (src) => {
       onLoadedMetadata = () => {
         try {
           video.currentTime = Math.min(1, video.duration / 2) || 0.5;
-        } catch (e) {
-          // ignore
-        }
+        } catch {}
       };
       onSeeked = () => {
         try {
@@ -31,17 +30,12 @@ const usePosterFromVideo = (src) => {
           canvas.height = video.videoHeight || 720;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-          setPoster(dataURL);
-        } catch (e) {
-          // Fallback silently
-        }
+          setPoster(canvas.toDataURL('image/jpeg', 0.8));
+        } catch {}
       };
       video.addEventListener('loadedmetadata', onLoadedMetadata);
       video.addEventListener('seeked', onSeeked);
-    } catch (e) {
-      // ignore
-    }
+    } catch {}
     return () => {
       if (video) {
         video.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -54,10 +48,7 @@ const usePosterFromVideo = (src) => {
   return poster;
 };
 
-const FeaturedProject = ({
-  title = 'Price Intelligence Dashboard',
-  videoSrc = DEFAULT_VIDEO,
-}) => {
+const FeaturedProject = ({ title = 'Price Intelligence Dashboard', videoSrc = PRICE_INTEL_VIDEO }) => {
   const cardVideoRef = useRef(null);
   const [hovering, setHovering] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -104,7 +95,7 @@ const FeaturedProject = ({
           >
             {/* Poster layer */}
             <div
-              className="absolute inset-0 z-10" 
+              className="absolute inset-0 z-10"
               style={{
                 backgroundImage: poster ? `url(${poster})` : 'radial-gradient(ellipse at center, rgba(20,184,166,0.25), transparent 60%), linear-gradient(135deg, #0b1220, #111827)',
                 backgroundSize: 'cover',
@@ -114,7 +105,7 @@ const FeaturedProject = ({
               }}
             />
 
-            {/* Video layer */}
+            {/* Inline video (plays on hover) */}
             <video
               ref={cardVideoRef}
               className="w-full h-[320px] md:h-[420px] object-cover"
@@ -125,7 +116,7 @@ const FeaturedProject = ({
               preload="metadata"
             />
 
-            {/* Title & play icon overlay */}
+            {/* Title + play icon overlay */}
             <div className="absolute inset-0 z-20 flex items-end justify-between p-5">
               <div>
                 <h3 className="text-white text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>{title}</h3>

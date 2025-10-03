@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
 import JourneyTimeline from "./components/JourneyTimeline";
@@ -7,6 +7,7 @@ import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
 import GlobalBackground from "./components/GlobalBackground";
+import DataStream from "./components/DataStream";
 
 const scrollStyles = `
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
@@ -20,10 +21,16 @@ const scrollStyles = `
 `;
 
 function App() {
+  const mainRef = useRef(null);
+  const sectionIds = ["hero", "story", "featured-project", "portfolio", "skills", "contact"];
+
   return (
     <div className="App" data-testid="app-root">
       <GlobalBackground />
       <style>{scrollStyles}</style>
+
+      {/* Left-side navigational data-stream */}
+      <DataStream mainRef={mainRef} sectionIds={sectionIds} />
 
       <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
         <div className="container mx-auto px-6">
@@ -43,7 +50,7 @@ function App() {
         </div>
       </nav>
 
-      <main data-testid="main-content">
+      <main ref={mainRef} data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
         <section id="story" data-testid="section-journey"><JourneyTimeline /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
