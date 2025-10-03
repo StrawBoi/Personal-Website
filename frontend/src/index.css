@@ -2,44 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global dark theme */
-:root {
-  --accent-teal: #14b8a6; /* Tailwind teal-500 */
-}
-
+/* Global true black theme */
+:root { --accent-teal: #14b8a6; }
 html, body { height: 100%; }
-
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0b1220; /* dark navy */
-  color: #ffffff; /* white text */
+  background-color: #000000; /* TRUE BLACK */
+  color: #ffffff;
 }
 
-/* Accent for links and interactive elements */
-/* Use specificity and !important to override utility classes when necessary */
+/* Links & buttons accent */
 nav a, a, a:visited { color: var(--accent-teal) !important; }
 a:hover { opacity: 0.9; }
-
 button, .btn, .btn-primary, [role="button"], button[type] {
   color: #ffffff !important;
   border: 1px solid var(--accent-teal) !important;
   background: transparent !important;
 }
-button:hover, .btn:hover, .btn-primary:hover, [role="button"]:hover { 
+button:hover, .btn:hover, .btn-primary:hover, [role="button"]:hover {
   background: color-mix(in oklab, var(--accent-teal) 18%, transparent) !important;
 }
 
-/* Enforce consistent dark backgrounds on all sections */
-section { 
-  background-color: #0b1220 !important; 
-  background-image: none !important; 
-}
+/* Ensure all sections inherit true black (hero uses video+overlay) */
+section { background-color: #000000 !important; background-image: none !important; }
 .hero-section { background-color: transparent !important; }
-
-/* Keep existing CSS variable system if used elsewhere */
-@layer base {
-  * { @apply border-border; }
-}

@@ -6,16 +6,14 @@ import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
-import GlobalBackground from "./components/GlobalBackground";
 import DataStream from "./components/DataStream";
 
 const scrollStyles = `
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
   ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-track { background: #1e293b; }
-  ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #10b981, #f59e0b, #3b82f6); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #059669, #d97706, #2563eb); }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #10b981, #0891b2); border-radius: 4px; }
   ::selection { background: rgba(16,185,129,0.3); color: white; }
   section { position: relative; overflow: hidden; }
 `;
@@ -26,10 +24,9 @@ function App() {
 
   return (
     <div className="App" data-testid="app-root">
-      <GlobalBackground />
       <style>{scrollStyles}</style>
 
-      <nav className="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
+      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10" data-testid="navbar">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             <div className="text-white font-bold text-xl" data-testid="navbar-brand">
@@ -47,9 +44,8 @@ function App() {
         </div>
       </nav>
 
-      {/* Make main relative so DataStream can be absolutely positioned inside */}
+      {/* Main is relative so DataStream beams can anchor below hero */}
       <main ref={mainRef} className="relative" data-testid="main-content">
-        {/* Left-side navigational data-stream anchored to hero bottom */}
         <DataStream mainRef={mainRef} sectionIds={sectionIds} />
 
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
@@ -60,7 +56,7 @@ function App() {
         <section id="contact" data-testid="section-contact"><Contact /></section>
       </main>
 
-      <footer className="bg-slate-900 border-t border-white/10 py-12" data-testid="footer">
+      <footer className="bg-black border-t border-white/10 py-12" data-testid="footer">
         <div className="container mx-auto px-6">
           <div className="text-center">
             <div className="border-t border-white/10 pt-4">

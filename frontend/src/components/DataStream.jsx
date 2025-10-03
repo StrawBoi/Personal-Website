@@ -2,61 +2,55 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 /**
- * Navigational Data-Stream (left-side vertical glowing path + active marker)
- * - Start anchored to the BOTTOM of the hero section
- * - Draws from hero bottom to end of main in sync with scroll
- * - Marker snaps to active section anchors (scrollspy)
+ * Navigational Data-Stream (Left & Right side light streams)
+ * - Background stays TRUE BLACK (#000)
+ * - Two dimmed teal light streams start just below the hero and "light up" progressively to page end
+ * - Smooth reveal tied to scroll; subtle rolling texture for motion
  */
-const TEAL = '#14b8a6';
+const TEAL = 'rgba(20,184,166,1)';
+const TEAL_DIM = 'rgba(20,184,166,0.12)';
+const TEAL_BRIGHT = 'rgba(20,184,166,0.35)';
+
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 
 const DataStream = ({ mainRef, sectionIds = [] }) => {
-  const svgRef = useRef(null);
   const containerRef = useRef(null);
-  const [anchors, setAnchors] = useState([]); // normalized [0..1] from hero bottom
-  const [activeIndex, setActiveIndex] = useState(0);
   const [heroHeight, setHeroHeight] = useState(0);
   const [streamHeight, setStreamHeight] = useState(0);
+  const [heroRatio, setHeroRatio] = useState(0); // fraction of main height occupied by hero
 
-  // Scroll progress across MAIN (entire content)
+  // Scroll progress across main
   const { scrollYProgress } = useScroll({ target: mainRef, offset: ["start start", "end end"] });
-  // Path draw from 0..1
-  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  // Reveal progress: 0 until passing hero bottom, then 0->1 to end
+  const revealProgress = useTransform(scrollYProgress, (p) => {
+    const r = heroRatio || 0;
+    if (p <= r) return 0;
+    const denom = Math.max(0.0001, 1 - r);
+    return clamp01((p - r) / denom);
+  });
+  // Smoothen marker progress (used if needed for future)
+  const revealSpring = useSpring(revealProgress, { stiffness: 120, damping: 20, mass: 0.3 });
 
-  const markerProgressSpring = useSpring(0, { stiffness: 120, damping: 20, mass: 0.3 });
-
-  // Recalculate dimensions and anchors relative to HERO bottom
   useEffect(() => {
     const recalc = () => {
       const mainEl = mainRef?.current;
       const heroEl = document.getElementById('hero');
       if (!mainEl || !heroEl) return;
 
-      const mainRect = mainEl.getBoundingClientRect();
-      const mainTopAbs = mainRect.top + window.scrollY;
-      const mainBottomAbs = mainRect.bottom + window.scrollY;
-
       const heroRect = heroEl.getBoundingClientRect();
       const heroTopAbs = heroRect.top + window.scrollY;
       const heroBottomAbs = heroRect.bottom + window.scrollY;
-
       const heroH = Math.max(0, heroBottomAbs - heroTopAbs);
       setHeroHeight(heroH);
 
-      // total content length from HERO BOTTOM to MAIN BOTTOM
-      const total = Math.max(1, mainBottomAbs - heroBottomAbs);
-      setStreamHeight(Math.max(0, mainEl.scrollHeight - heroH));
+      const mainRect = mainEl.getBoundingClientRect();
+      const mainTopAbs = mainRect.top + window.scrollY;
+      const mainBottomAbs = mainRect.bottom + window.scrollY;
+      const mainTotal = Math.max(1, mainBottomAbs - mainTopAbs);
+      const streamH = Math.max(0, mainEl.scrollHeight - heroH);
+      setStreamHeight(streamH);
 
-      // anchors normalized from HERO BOTTOM
-      const nextAnchors = sectionIds.map((id) => {
-        const el = document.getElementById(id);
-        if (!el) return 0;
-        const rect = el.getBoundingClientRect();
-        const topAbs = rect.top + window.scrollY;
-        const norm = clamp01((topAbs - heroBottomAbs) / total);
-        return norm;
-      });
-      setAnchors(nextAnchors);
+      setHeroRatio(clamp01(heroH / (heroH + streamH)));
     };
 
     recalc();
@@ -73,77 +67,62 @@ const DataStream = ({ mainRef, sectionIds = [] }) => {
       window.removeEventListener('orientationchange', recalc);
       window.removeEventListener('scroll', recalc);
     };
-  }, [mainRef, sectionIds]);
+  }, [mainRef]);
 
-  // Active section by closest to viewport center
-  useEffect(() => {
-    const onScroll = () => {
-      const viewportCenter = window.scrollY + window.innerHeight / 2;
-      let bestIdx = 0; let bestDist = Infinity;
-      sectionIds.forEach((id, i) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        const center = rect.top + window.scrollY + rect.height / 2;
-        const dist = Math.abs(center - viewportCenter);
-        if (dist < bestDist) { bestDist = dist; bestIdx = i; }
-      });
-      setActiveIndex(bestIdx);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [sectionIds]);
+  if (streamHeight <= 0) return null;
 
-  // Animate marker to active anchor position (relative to HERO bottom)
-  useEffect(() => {
-    const p = anchors[activeIndex] ?? 0;
-    markerProgressSpring.set(p);
-  }, [activeIndex, anchors, markerProgressSpring]);
-
-  // Marker Y within SVG (0..streamHeight)
-  const markerY = useTransform(markerProgressSpring, (p) => Math.max(0, Math.min(streamHeight, p * streamHeight)));
-
-  // If dimensions are not ready yet, don't render
-  const ready = streamHeight > 0 && heroHeight >= 0;
-
-  return ready ? (
-    <div
-      ref={containerRef}
-      className="pointer-events-none absolute left-2 z-40"
-      style={{ top: heroHeight, height: streamHeight, width: 40 }}
-      aria-hidden
-    >
-      <svg ref={svgRef} width="40" height={streamHeight} viewBox={`0 0 40 ${Math.max(1, streamHeight)}`} preserveAspectRatio="none">
-        <defs>
-          <filter id="glow">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor={TEAL} floodOpacity="0.9"/>
-          </filter>
-        </defs>
-        {/* Vertical path (glowing) from y=0 to streamHeight */}
-        <motion.path
-          d={`M18 0 L18 ${Math.max(0, streamHeight - 2)}`}
-          stroke={TEAL}
-          strokeWidth="2"
-          strokeLinecap="round"
-          style={{ pathLength }}
-          filter="url(#glow)"
-          fill="transparent"
+  const Beam = ({ side }) => {
+    return (
+      <div
+        className={`pointer-events-none absolute ${side === 'left' ? 'left-0' : 'right-0'}`}
+        style={{ top: heroHeight, height: streamHeight, width: 56 }}
+        aria-hidden
+        data-testid={`datastream-${side}`}
+      >
+        {/* Base dim beam (full length, subtle) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(closest-side, ${TEAL_DIM} 0%, rgba(20,184,166,0.06) 55%, rgba(0,0,0,0) 100%)`,
+            filter: 'blur(18px)',
+            opacity: 0.9,
+          }}
         />
-        {/* Marker (glowing teal circle with pulsing animation) */}
-        <motion.circle
-          cx="18"
-          cy={markerY}
-          r="5.5"
-          fill={TEAL}
-          filter="url(#glow)"
-          initial={{ scale: 1 }}
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        {/* Rolling texture overlay (subtle) */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `repeating-linear-gradient(to bottom, rgba(255,255,255,0.04) 0, rgba(255,255,255,0.04) 2px, transparent 10px)`,
+            animation: 'roll 12s linear infinite',
+            opacity: 0.25,
+          }}
         />
-      </svg>
-    </div>
-  ) : null;
+        {/* Bright reveal layer: scaleY with scroll to "light up" bit by bit */}
+        <motion.div
+          className="absolute left-0 right-0 origin-top"
+          style={{
+            top: 0,
+            bottom: 0,
+            scaleY: revealSpring,
+            background: `radial-gradient(closest-side, ${TEAL_BRIGHT} 0%, rgba(20,184,166,0.18) 55%, rgba(0,0,0,0) 100%)`,
+            filter: 'blur(12px)',
+          }}
+          data-testid={`datastream-${side}-reveal`}
+        />
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Beam side="left" />
+      <Beam side="right" />
+      {/* Local keyframes for rolling texture */}
+      <style>{`
+        @keyframes roll { from { background-position-y: 0; } to { background-position-y: 200px; } }
+      `}</style>
+    </>
+  );
 };
 
 export default DataStream;
