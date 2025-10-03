@@ -7,9 +7,7 @@
   --accent-teal: #14b8a6; /* Tailwind teal-500 */
 }
 
-html, body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
   margin: 0;
@@ -20,17 +18,25 @@ body {
   color: #ffffff; /* white text */
 }
 
-/* Base elements */
-a { color: var(--accent-teal); }
+/* Accent for links and interactive elements */
+/* Use specificity and !important to override utility classes when necessary */
+nav a, a, a:visited { color: var(--accent-teal) !important; }
 a:hover { opacity: 0.9; }
 
-button, .btn, .btn-primary {
-  color: #ffffff;
-  border-color: var(--accent-teal);
+button, .btn, .btn-primary, [role="button"], button[type] {
+  color: #ffffff !important;
+  border: 1px solid var(--accent-teal) !important;
+  background: transparent !important;
+}
+button:hover, .btn:hover, .btn-primary:hover, [role="button"]:hover { 
+  background: color-mix(in oklab, var(--accent-teal) 18%, transparent) !important;
 }
 
-/* Ensure all sections adopt the dark base; hero overrides via its overlay */
-section { background-color: #0b1220; }
+/* Enforce consistent dark backgrounds on all sections */
+section { 
+  background-color: #0b1220 !important; 
+  background-image: none !important; 
+}
 .hero-section { background-color: transparent !important; }
 
 /* Keep existing CSS variable system if used elsewhere */
