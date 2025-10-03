@@ -1,13 +1,18 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
-import { Lightbulb, Cpu, LineChart, GraduationCap } from "lucide-react";
+import { Lightbulb, Cpu, LineChart, GraduationCap, Briefcase, Wrench, Rocket, Shield } from "lucide-react";
 
-// Four key roles for the refined vertical timeline
+// Expanded roles for a larger cohesive journey
 const items = [
   { title: "Creative Director | EcoNarrate", period: "APRIL 2024 – PRESENT", icon: Lightbulb },
   { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023", icon: Cpu },
   { title: "SEO Optimization and Sales Representative | Wisdek", period: "JANUARY 2017 – DECEMBER 2017", icon: LineChart },
   { title: "Subject Matter Expert | Altice One", period: "2015 – 2016", icon: GraduationCap },
+  // Added experiences (you can update titles/periods later)
+  { title: "Business Consultant | Ghasa Marine", period: "MAY 2023 – DECEMBER 2023", icon: Briefcase },
+  { title: "Operations Lead | [Add Company]", period: "[Add Period]", icon: Wrench },
+  { title: "Product Strategist | [Add Company]", period: "[Add Period]", icon: Rocket },
+  { title: "Security/Compliance Advisor | [Add Company]", period: "[Add Period]", icon: Shield },
 ];
 
 const Card = ({ i, title, period, progress, onHover, onLeave, Icon }) => {
@@ -20,7 +25,7 @@ const Card = ({ i, title, period, progress, onHover, onLeave, Icon }) => {
 
   return (
     <motion.div
-      className={`relative w-full md:w-[58%] ${isLeft ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
+      className={`relative w-full md:w-[62%] ${isLeft ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
       style={{ opacity, y, x }}
       onMouseEnter={() => onHover(i)}
       onMouseLeave={onLeave}
@@ -74,9 +79,9 @@ const JourneyTimeline = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
-    <section id="story" className="relative py-24" data-testid="section-journey">
+    <section id="story" className="relative py-28" data-testid="section-journey">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: "Inter, sans-serif" }}>My Journey</h2>
           <p
             className="mt-5 max-w-3xl mx-auto text-gray-300 text-lg md:text-xl leading-relaxed"
@@ -98,7 +103,7 @@ const JourneyTimeline = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-10 w-full max-w-6xl">
+          <div className="grid grid-cols-1 gap-12 w-full max-w-6xl">
             {items.map((it, i) => {
               const Icon = it.icon;
               return (
@@ -127,21 +132,21 @@ const JourneyTimeline = () => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.35, ease: 'easeOut' }}
-            className="fixed top-16 right-0 bottom-0 w-full md:w-[520px] bg-black/95 border-l border-white/10 z-50 overflow-auto"
+            className="fixed top-16 right-0 bottom-0 w-full md:w-[560px] bg-black/95 border-l border-white/10 z-50 overflow-auto"
             data-testid="journey-hover-panel"
           >
-            <div className="p-6 space-y-6">
+            <div className="p-7 space-y-7">
               <div>
                 <h3 className="text-2xl font-semibold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>{items[hoveredIndex].title}</h3>
                 <p className="text-gray-400 mt-1" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{items[hoveredIndex].period}</p>
               </div>
               <div>
                 <h4 className="text-white font-semibold text-lg">Job Description</h4>
-                <p className="text-gray-300 mt-2">Placeholder description for the role detailing responsibilities and core areas of ownership. We will populate this with the finalized copy.</p>
+                <p className="text-gray-300 mt-2">Placeholder description for the role detailing responsibilities and core areas of ownership. Replace this with your actual job description.</p>
               </div>
               <div>
                 <h4 className="text-white font-semibold text-lg">Key Achievement</h4>
-                <p className="text-gray-300 mt-2">Placeholder narrative highlighting a notable outcome, impact, or business value delivered during this role.</p>
+                <p className="text-gray-300 mt-2">Placeholder achievement detailing a specific measurable impact or business outcome delivered in this role.</p>
               </div>
               <div>
                 <h4 className="text-white font-semibold text-lg">Skills Learnt</h4>

@@ -1,165 +1,77 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 
-// Updated video URL and default title/tagline
-const PRICE_INTEL_VIDEO = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
+// Tackle project video (same as before)
+const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
 
-// Try to capture a poster frame; fallback to gradient if CORS prevents it
-const usePosterFromVideo = (src) => {
-  const [poster, setPoster] = useState(null);
+const FeaturedProject = () => {
+  const sectionRef = useRef(null); // outer section with tall height (pin duration)
+  const stickyRef = useRef(null); // inner sticky container
+  const videoRef = useRef(null);
+  const [duration, setDuration] = useState(0);
 
+  // Scroll progress for the takeover section (0..1 across 300vh)
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end end"] });
+
+  // Video scale/width animation: 0 -> 1 -> 0 back
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.7, 1, 0.7]);
+
+  // Scrub video with scroll
   useEffect(() => {
-    let video;
-    let onLoadedMetadata;
-    let onSeeked;
-    try {
-      video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.src = src;
-      video.preload = 'metadata';
-      onLoadedMetadata = () => {
-        try {
-          video.currentTime = Math.min(1, video.duration / 2) || 0.5;
-        } catch {}
-      };
-      onSeeked = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth || 1280;
-          canvas.height = video.videoHeight || 720;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          setPoster(canvas.toDataURL('image/jpeg', 0.8));
-        } catch {}
-      };
-      video.addEventListener('loadedmetadata', onLoadedMetadata);
-      video.addEventListener('seeked', onSeeked);
-    } catch {}
-    return () => {
-      if (video) {
-        video.removeEventListener('loadedmetadata', onLoadedMetadata);
-        video.removeEventListener('seeked', onSeeked);
-        video.src = '';
-      }
-    };
-  }, [src]);
-
-  return poster;
-};
-
-const FeaturedProject = ({ title = 'Tackle', videoSrc = PRICE_INTEL_VIDEO, tagline = 'Your solution to pricing intelligently!' }) => {
-  const cardVideoRef = useRef(null);
-  const [hovering, setHovering] = useState(false);
-  const [lightbox, setLightbox] = useState(false);
-  const poster = usePosterFromVideo(videoSrc);
-
-  useEffect(() => {
-    const v = cardVideoRef.current;
+    const v = videoRef.current;
     if (!v) return;
-    if (hovering) {
-      v.muted = true;
-      v.loop = true;
-      v.play().catch(() => {});
-    } else {
-      v.pause();
-      v.currentTime = 0;
-    }
-  }, [hovering]);
+    const onLoaded = () => {
+      try {
+        setDuration(v.duration || 0);
+        v.pause(); // ensure we are in manual scrubbing mode
+        v.currentTime = 0;
+        v.muted = true;
+        v.playsInline = true;
+      } catch (e) {}
+    };
+    v.addEventListener('loadedmetadata', onLoaded);
+    return () => v.removeEventListener('loadedmetadata', onLoaded);
+  }, []);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setLightbox(false); };
-    if (lightbox) document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [lightbox]);
+    let raf;
+    const unsub = scrollYProgress.on('change', (p) => {
+      const v = videoRef.current;
+      if (!v || !duration) return;
+      const t = Math.max(0, Math.min(duration, p * duration));
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        try { v.currentTime = t; } catch (e) {}
+      });
+    });
+    return () => { if (unsub) unsub(); if (raf) cancelAnimationFrame(raf); };
+  }, [scrollYProgress, duration]);
 
   return (
-    <section id="featured-project" className="py-24" data-testid="section-featured-project">
-      <div className="container mx-auto px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>Featured Project</h2>
-        </div>
-
-        <div className="max-w-5xl mx-auto">
-          <div
-            className="relative rounded-2xl overflow-hidden border cursor-pointer"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(14px)',
-              border: '1px solid rgba(255,255,255,0.18)'
-            }}
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-            onClick={() => setLightbox(true)}
-            data-testid="cinematic-video-card"
-          >
-            {/* Poster layer */}
-            <div
-              className="absolute inset-0 z-10"
-              style={{
-                backgroundImage: poster ? `url(${poster})` : 'radial-gradient(ellipse at center, rgba(20,184,166,0.25), transparent 60%), linear-gradient(135deg, #0b1220, #111827)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                opacity: hovering ? 0 : 1,
-                transition: 'opacity 300ms ease',
-              }}
-            />
-
-            {/* Inline video (plays on hover) */}
-            <video
-              ref={cardVideoRef}
-              className="w-full h-[320px] md:h-[420px] object-cover"
-              src={videoSrc}
-              playsInline
-              muted
-              loop
-              preload="metadata"
-            />
-
-            {/* Title + tagline + play icon overlay */}
-            <div className="absolute inset-0 z-20 flex items-end justify-between p-5">
-              <div>
-                <h3 className="text-white text-xl md:text-2xl font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>{title}</h3>
-                <p className="text-gray-300 text-sm md:text-base">{tagline}</p>
-              </div>
-              <div className="flex items-center justify-center w-12 h-12 rounded-full"
-                   style={{ background: 'rgba(20,184,166,0.15)', border: '1px solid rgba(20,184,166,0.6)' }}>
-                <Play className="text-teal-400" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Lightbox */}
-        <AnimatePresence>
-          {lightbox && (
-            <motion.div
-              className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              data-testid="video-lightbox"
-            >
-              <div className="relative w-full max-w-5xl">
-                <button
-                  onClick={() => setLightbox(false)}
-                  className="absolute -top-10 right-0 text-white/80 hover:text-white"
-                  data-testid="video-lightbox-close"
-                >
-                  <X size={28} />
-                </button>
-                <video
-                  src={videoSrc}
-                  className="w-full h-[60vh] object-contain bg-black"
-                  controls
-                  autoPlay
-                  playsInline
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <section id="featured-project" ref={sectionRef} className="relative" style={{ height: '300vh' }} data-testid="section-featured-project">
+      {/* Sticky container pinned during the takeover */}
+      <div ref={stickyRef} className="sticky top-0 flex items-center justify-center h-screen">
+        <motion.div
+          style={{ scale }}
+          className="w-[70vw] max-w-[1280px] aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(20,184,166,0.15)]"
+          data-testid="featured-video-frame"
+        >
+          <video
+            ref={videoRef}
+            src={VIDEO_SRC}
+            className="w-full h-full object-cover bg-black"
+            preload="auto"
+            muted
+            playsInline
+          />
+        </motion.div>
       </div>
+      {/* Contextual heading above and spacer below for flow */}
+      <div className="pointer-events-none absolute top-8 left-1/2 -translate-x-1/2 text-center z-10">
+        <h2 className="text-white text-2xl font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>Featured Project</h2>
+        <p className="text-gray-300 text-sm">Tackle — Your solution to pricing intelligently</p>
+      </div>
+      {/* After takeover ends, content continues normally (spacer not needed due to 300vh) */}
     </section>
   );
 };
