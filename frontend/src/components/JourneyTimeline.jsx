@@ -1,15 +1,16 @@
-import React, { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import React, { useRef, useState } from "react";
+import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
+import { Lightbulb, Cpu, LineChart, GraduationCap } from "lucide-react";
 
 // Four key roles for the refined vertical timeline
 const items = [
-  { title: "Creative Director | EcoNarrate", period: "APRIL 2024 – PRESENT" },
-  { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023" },
-  { title: "SEO Optimization and Sales Representative | Wisdek", period: "JANUARY 2017 – DECEMBER 2017" },
-  { title: "Subject Matter Expert | Altice One", period: "2015 – 2016" },
+  { title: "Creative Director | EcoNarrate", period: "APRIL 2024 – PRESENT", icon: Lightbulb },
+  { title: "Information Technology Head Officer | Ammosshipping", period: "FEBRUARY 2019 – AUGUST 2023", icon: Cpu },
+  { title: "SEO Optimization and Sales Representative | Wisdek", period: "JANUARY 2017 – DECEMBER 2017", icon: LineChart },
+  { title: "Subject Matter Expert | Altice One", period: "2015 – 2016", icon: GraduationCap },
 ];
 
-const Card = ({ i, title, period, progress }) => {
+const Card = ({ i, title, period, progress, onHover, onLeave, Icon }) => {
   // Reveal the card as the line "reaches" its position
   const triggerPoint = (i + 1) / (items.length + 0.5);
   const opacity = useTransform(progress, [triggerPoint - 0.12, triggerPoint], [0, 1]);
@@ -19,8 +20,10 @@ const Card = ({ i, title, period, progress }) => {
 
   return (
     <motion.div
-      className={`relative w-full md:w-[46%] ${isLeft ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
+      className={`relative w-full md:w-[58%] ${isLeft ? "md:mr-12 md:self-end" : "md:ml-12 md:self-start"}`}
       style={{ opacity, y, x }}
+      onMouseEnter={() => onHover(i)}
+      onMouseLeave={onLeave}
       data-testid={`journey-card-${i}`}
     >
       {/* Connector from center line to card */}
@@ -43,17 +46,20 @@ const Card = ({ i, title, period, progress }) => {
         aria-hidden
       />
 
-      {/* Glassmorphism card */}
+      {/* Glassmorphism card (larger) */}
       <div
-        className="rounded-2xl p-5 border"
+        className="rounded-2xl p-7 border"
         style={{
           background: "rgba(255,255,255,0.08)",
           backdropFilter: "blur(14px)",
           border: "1px solid rgba(255,255,255,0.18)",
         }}
       >
-        <h3 className="text-white text-lg font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
-        <p className="text-gray-300 mt-1" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
+        <div className="flex items-center gap-3">
+          {Icon ? <Icon className="w-6 h-6 text-teal-400" /> : null}
+          <h3 className="text-white text-xl font-semibold" style={{ fontFamily: "Inter, sans-serif" }}>{title}</h3>
+        </div>
+        <p className="text-gray-300 mt-2" style={{ fontFamily: "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace" }}>{period}</p>
       </div>
     </motion.div>
   );
@@ -64,6 +70,8 @@ const JourneyTimeline = () => {
   const inView = useInView(containerRef, { margin: "-20% 0px -20% 0px" });
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
   const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
     <section id="story" className="relative py-24" data-testid="section-journey">
@@ -90,13 +98,63 @@ const JourneyTimeline = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-10 w-full max-w-5xl">
-            {items.map((it, i) => (
-              <Card key={i} i={i} title={it.title} period={it.period} progress={scrollYProgress} />
-            ))}
+          <div className="grid grid-cols-1 gap-10 w-full max-w-6xl">
+            {items.map((it, i) => {
+              const Icon = it.icon;
+              return (
+                <Card
+                  key={i}
+                  i={i}
+                  title={it.title}
+                  period={it.period}
+                  progress={scrollYProgress}
+                  onHover={setHoveredIndex}
+                  onLeave={() => setHoveredIndex(null)}
+                  Icon={Icon}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
+
+      {/* Hover-to-reveal Side Panel */}
+      <AnimatePresence>
+        {hoveredIndex !== null && (
+          <motion.aside
+            key="journey-sidepanel"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.35, ease: 'easeOut' }}
+            className="fixed top-16 right-0 bottom-0 w-full md:w-[520px] bg-black/95 border-l border-white/10 z-50 overflow-auto"
+            data-testid="journey-hover-panel"
+          >
+            <div className="p-6 space-y-6">
+              <div>
+                <h3 className="text-2xl font-semibold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>{items[hoveredIndex].title}</h3>
+                <p className="text-gray-400 mt-1" style={{ fontFamily: "'Roboto Mono', ui-monospace" }}>{items[hoveredIndex].period}</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Job Description</h4>
+                <p className="text-gray-300 mt-2">Placeholder description for the role detailing responsibilities and core areas of ownership. We will populate this with the finalized copy.</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Key Achievement</h4>
+                <p className="text-gray-300 mt-2">Placeholder narrative highlighting a notable outcome, impact, or business value delivered during this role.</p>
+              </div>
+              <div>
+                <h4 className="text-white font-semibold text-lg">Skills Learnt</h4>
+                <ul className="text-gray-300 list-disc pl-5 mt-2 space-y-1">
+                  <li>Placeholder skill 1</li>
+                  <li>Placeholder skill 2</li>
+                  <li>Placeholder skill 3</li>
+                </ul>
+              </div>
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
