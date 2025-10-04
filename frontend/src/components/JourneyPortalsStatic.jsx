@@ -159,29 +159,135 @@ function Portal({ act, onClick }) {
 }
 
 function CinematicModal({ open, onClose, act }) {
+  if (!act) return null;
+
   return (
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[90] flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-black/85" onClick={onClose} />
-          <motion.div className="relative w-[min(1080px,92vw)] h-[min(86vh,820px)] rounded-2xl border overflow-hidden text-white"
-            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }} transition={{ type: "spring", stiffness: 240, damping: 26 }}
+          <motion.div 
+            className="relative w-[min(1100px,90vw)] max-h-[88vh] rounded-xl overflow-hidden text-white"
+            initial={{ scale: 0.9, opacity: 0 }} 
+            animate={{ scale: 1, opacity: 1 }} 
+            exit={{ scale: 0.96, opacity: 0 }} 
+            transition={{ type: "spring", stiffness: 240, damping: 26 }}
             style={{
-              background: "rgba(10,10,12,0.96)",
-              boxShadow: `0 0 0 2px ${act?.color}AA, 0 0 36px ${act?.color}AA, 0 0 72px ${act?.color}55, inset 0 0 24px ${act?.color}22`,
+              background: "linear-gradient(to bottom, rgba(30,30,32,0.98), rgba(20,20,22,0.98))",
+              border: "1px solid rgba(60,60,62,0.9)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
             }}
           >
-            <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: `inset 0 0 60px ${act?.color}22` }} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.h3 initial={{ letterSpacing: "0.05em", opacity: 0 }} animate={{ letterSpacing: "0.12em", opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }} className="text-2xl md:text-3xl font-semibold text-white text-center px-6">
-                {act?.title}
-              </motion.h3>
-            </div>
-            <div className="relative z-10 h-full w-full flex items-end">
-              <div className="w-full p-6">
-                <div className="text-gray-300 text-lg uppercase tracking-widest">Overview</div>
-                <div className="mt-2 text-white text-base md:text-xl">[Placeholder content — story details will appear here.]</div>
+            {/* macOS window controls */}
+            <div className="sticky top-0 z-20 flex items-center px-4 py-3 border-b border-gray-700/50 bg-gradient-to-b from-[rgba(40,40,42,0.95)] to-[rgba(35,35,37,0.95)]" style={{ backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
+              <div className="flex gap-2">
+                <button onClick={onClose} className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff4d43] transition-colors" aria-label="Close" />
+                <button className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffb01f] transition-colors" aria-label="Minimize" />
+                <button className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#1fb932] transition-colors" aria-label="Maximize" />
               </div>
+              <div className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-400 font-medium tracking-wide">
+                {act.title}
+              </div>
+            </div>
+
+            {/* scrollable content */}
+            <div className="overflow-y-auto max-h-[calc(88vh-50px)] px-8 py-6">
+              {act.id === "communication" ? (
+                <div className="space-y-8">
+                  {/* Top wide section */}
+                  <div className="text-center pb-6 border-b border-gray-700/40">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">The Journey of Communication</h2>
+                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+                      Honing the skills and crafting the key learnings that lead the rest of my journey.
+                    </p>
+                  </div>
+
+                  {/* Two columns: Key Skills & Technical Skills */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Key Skills Honed</h3>
+                      <ul className="space-y-2 text-gray-300">
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Mastering Soft Skills</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Communication</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Problem Solving</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Emotional Intelligence</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Time Management</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Product knowledge</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Technical Skills</h3>
+                      <ul className="space-y-2 text-gray-300">
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Clear Communication of Technical Information</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Documentation and Attention to Detail</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Adaptability and Continuous Learning</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Adapting to Different CRM Software</li>
+                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Understanding Different Ticketing Systems</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Key Achievements */}
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Key Achievements</h3>
+                    <ul className="space-y-3 text-gray-300">
+                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Average resolution rate of 8% across the 4 years experience</li>
+                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Average NPS 8.3</li>
+                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Improved the knowledge base with useful information on the usage of technical tools</li>
+                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Promoted to Subject Matter Expert "SME" and improved communication channels across teams</li>
+                    </ul>
+                  </div>
+
+                  {/* Job Responsibilities - Two columns */}
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Job Responsibilities</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-gray-300">
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Internal Communication</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Frontline Customer Interaction & Case Management</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Ticket Management</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Prioritize Inquiries</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Identify Knowledge Gaps</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Maintain Detailed Records</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Problem-Solving & Troubleshooting</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Active Listening and Issue Diagnosis</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Technical Troubleshooting</div>
+                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>De-escalation</div>
+                    </div>
+                  </div>
+
+                  {/* Job Experience Cards */}
+                  <div>
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Professional Experience</h3>
+                    <div className="space-y-4">
+                      {act.details.jobs.map((job, idx) => (
+                        <div key={`job-${idx}`} className="border border-gray-700/50 rounded-lg p-4 bg-black/30 hover:bg-black/40 transition-colors">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <h4 className="text-lg font-semibold text-white">{job.role}</h4>
+                              <p className="text-gray-400 text-sm">{job.company}</p>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-teal-400 text-sm font-medium">{job.period}</span>
+                              <div className="w-12 h-12 mt-2 rounded-lg bg-gray-800/50 border border-gray-700/50 flex items-center justify-center text-gray-500 text-xs">Logo</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Placeholder for Act II and III
+                <div className="space-y-6">
+                  <div className="text-center pb-6 border-b border-gray-700/40">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">{act.title}</h2>
+                    <p className="text-gray-300 text-lg">Content coming soon...</p>
+                  </div>
+                  <div className="text-gray-400">
+                    <p>This section is under development. Stay tuned for updates!</p>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </motion.div>
