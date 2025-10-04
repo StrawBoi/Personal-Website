@@ -384,8 +384,142 @@ function CinematicModal({ open, onClose, act }) {
                     </div>
                   </motion.div>
                 </div>
+              ) : act.id === "software" ? (
+                <div className="space-y-8">
+                  {/* Top wide section */}
+                  <motion.div 
+                    className="text-center pb-6 border-b border-gray-700/40"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">From a Hands-on Builder to a Strategic Leader</h2>
+                    <p className="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+                      Junior Web Developer to Full Stack to Department Head
+                    </p>
+                  </motion.div>
+
+                  {/* Technical Skills Section */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  >
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-green-500/40 pb-2">Technical and Problem-Solving Skills</h3>
+                    <ul className="space-y-2 text-gray-300">
+                      {act.details.skills.technical.map((skill, i) => (
+                        <motion.li 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
+                        >
+                          <span className="text-green-400 mr-2">•</span>{skill}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  {/* Working Kit - 2 columns */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                  >
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-green-500/40 pb-2">Working Kit</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2 text-gray-300">
+                      {act.details.skills.workingKit.map((tool, i) => (
+                        <motion.div 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.6 + i * 0.03 }}
+                        >
+                          <span className="text-green-400 mr-2">•</span>{tool}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Key Achievements */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.7 }}
+                  >
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-green-500/40 pb-2">Key Achievements</h3>
+                    <ul className="space-y-3 text-gray-300">
+                      {act.details.achievements.map((achievement, i) => (
+                        <motion.li 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.8 + i * 0.05 }}
+                        >
+                          <span className="text-green-400 mr-2">•</span>{achievement}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  {/* Responsibilities */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.9 }}
+                  >
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-green-500/40 pb-2">Responsibilities</h3>
+                    <ul className="space-y-3 text-gray-300">
+                      {act.details.responsibilities.map((resp, i) => (
+                        <motion.li 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 1.0 + i * 0.05 }}
+                        >
+                          <span className="text-green-400 mr-2">•</span>{resp}
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </motion.div>
+
+                  {/* Job Experience Cards */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 1.1 }}
+                  >
+                    <h3 className="text-xl font-semibold text-white mb-4 border-b border-green-500/40 pb-2">Professional Experience</h3>
+                    <div className="space-y-4">
+                      {act.details.jobs.map((job, idx) => (
+                        <motion.div 
+                          key={`job-${idx}`} 
+                          className="border border-gray-700/50 rounded-lg p-4 bg-black/30 hover:bg-black/40 transition-colors"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: 1.2 + idx * 0.1 }}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <h4 className="text-lg font-semibold text-white">{job.role}</h4>
+                              <p className="text-gray-400 text-sm">{job.company}</p>
+                            </div>
+                            <div className="flex flex-col items-end">
+                              <span className="text-green-400 text-sm font-medium">{job.period}</span>
+                              <div className="w-12 h-12 mt-2 rounded-lg bg-gray-800/50 border border-gray-700/50 flex items-center justify-center text-gray-500 text-xs">Logo</div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
               ) : (
-                // Placeholder for Act II and III
+                // Placeholder for Act III
                 <div className="space-y-6">
                   <div className="text-center pb-6 border-b border-gray-700/40">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">{act.title}</h2>
