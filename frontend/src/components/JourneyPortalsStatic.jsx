@@ -126,6 +126,25 @@ function Portal({ act, onClick }) {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
     >
+      {/* optional background image for Communication */}
+      {act.id === "communication" && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url('/comm-bg.jpg')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.26,
+            mixBlendMode: "screen",
+            filter: "saturate(1.05) brightness(0.95)",
+          }}
+        />
+      )}
+      {/* dark scrim to keep text readable */}
+      {act.id === "communication" && (
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55))" }} />
+      )}
+
       {/* sharp neon edge accent */}
       <motion.span className="pointer-events-none absolute inset-[2px] rounded-[26px] block" style={{ boxShadow: `0 -18px 48px ${act.color}, 0 14px 56px ${act.color}AA` }} />
 
