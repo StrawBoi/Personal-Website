@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import "./App.css";
 import CinematicHero from "./components/CinematicHero";
-import JourneyMindMap from "./components/JourneyMindMap";
+import JourneySplitTimeline from "./components/JourneySplitTimeline";
 import FeaturedProject from "./components/FeaturedProject";
 import CaseStudies from "./components/CaseStudies";
 import Toolkit from "./components/Toolkit";
@@ -16,7 +16,7 @@ const scrollStyles = `
   ::-webkit-scrollbar-track { background: #0a0a0a; }
   ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #10b981, #0891b2); border-radius: 4px; }
   ::selection { background: rgba(16,185,129,0.3); color: white; }
-  section { position: relative; overflow: hidden; }
+  section { position: relative; overflow: visible; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `;
@@ -52,10 +52,7 @@ function App() {
 
       <main ref={mainRef} className="relative" data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
-        {/* Override global overflow for story so content is visible */}
-        <section id="story" data-testid="section-journey" style={{ overflow: "visible" }}>
-          <JourneyMindMap />
-        </section>
+        <section id="story" data-testid="section-journey"><JourneySplitTimeline /></section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
         <section id="skills" data-testid="section-toolkit"><Toolkit /></section>
