@@ -258,15 +258,31 @@ function CinematicModal({ open, onClose, act }) {
                   </motion.div>
 
                   {/* Key Achievements */}
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                  >
                     <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Key Achievements</h3>
                     <ul className="space-y-3 text-gray-300">
-                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Average resolution rate of 8% across the 4 years experience</li>
-                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Average NPS 8.3</li>
-                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Improved the knowledge base with useful information on the usage of technical tools</li>
-                      <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Promoted to Subject Matter Expert "SME" and improved communication channels across teams</li>
+                      {[
+                        "Average resolution rate of 8% across the 4 years experience",
+                        "Average NPS 8.3",
+                        "Improved the knowledge base with useful information on the usage of technical tools",
+                        'Promoted to Subject Matter Expert "SME" and improved communication channels across teams'
+                      ].map((achievement, i) => (
+                        <motion.li 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.7 + i * 0.05 }}
+                        >
+                          <span className="text-teal-400 mr-2">•</span>{achievement}
+                        </motion.li>
+                      ))}
                     </ul>
-                  </div>
+                  </motion.div>
 
                   {/* Job Responsibilities - Two columns */}
                   <div>
