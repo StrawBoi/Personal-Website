@@ -52,7 +52,10 @@ function App() {
 
       <main ref={mainRef} className="relative" data-testid="main-content">
         <section id="hero" data-testid="section-hero"><CinematicHero /></section>
-        <section id="story" data-testid="section-journey"><JourneyMindMap /></section>
+        {/* Override global overflow for story so content is visible */}
+        <section id="story" data-testid="section-journey" style={{ overflow: "visible" }}>
+          <JourneyMindMap />
+        </section>
         <section id="featured-project" data-testid="section-featured-project"><FeaturedProject /></section>
         <section id="portfolio" data-testid="section-case-studies"><CaseStudies /></section>
         <section id="skills" data-testid="section-toolkit"><Toolkit /></section>

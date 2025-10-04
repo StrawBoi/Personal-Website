@@ -175,7 +175,6 @@ const journeyData = {
   ],
 };
 
-// Node card component (sharp edges, clean text)
 function Card({ node, w, h, onClick, isFocused }) {
   const style = {
     left: node.x - w / 2,
@@ -223,9 +222,7 @@ function computeHorizontalLayout(data, width, height) {
   const nodes = [];
   const links = [];
 
-  const cx = width / 2;
   const cy = Math.max(280, height * 0.55);
-
   const spineLeft = Math.max(40, width * 0.08);
   const spineRight = width - Math.max(40, width * 0.08);
 
@@ -234,50 +231,43 @@ function computeHorizontalLayout(data, width, height) {
 
   // Place Acts evenly on the spine
   const actXs = [0.2, 0.5, 0.8].map((p) => spineLeft + (spineRight - spineLeft) * p);
-  const actW = 220;
+  const actW = 240;
   const actH = 44;
-  const subW = 200;
+  const subW = 220;
   const subH = 40;
-  const jobW = 260;
-  const jobH = 56;
+  const jobW = 300;
+  const jobH = 60;
 
-  // optional center node (left of first act)
+  // center node (left of first act)
   const centerX = spineLeft - 120;
-  nodes.push({ id: data.center.id, type: "center", label: data.center.label, x: centerX, y: cy, w: 180, h: 44 });
-  links.push({ type: "stub", x1: centerX + 90, y1: cy, x2: spineLeft, y2: cy });
+  nodes.push({ id: data.center.id, type: "center", label: data.center.label, x: centerX, y: cy, w: 200, h: 44 });
+  links.push({ type: "stub", x1: centerX + 100, y1: cy, x2: spineLeft, y2: cy });
 
   data.acts.forEach((act, i) => {
-    const ax = actXs[i] ?? cx;
+    const ax = actXs[i];
     const ay = cy;
-    const actNode = { id: act.id, type: "act", label: act.label, x: ax, y: ay, w: actW, h: actH };
-    nodes.push(actNode);
-
-    // vertical tap from spine to act (tiny, for clarity)
-    links.push({ type: "stub", x1: ax, y1: cy - 16, x2: ax, y2: cy + 16 });
+    nodes.push({ id: act.id, type: "act", label: act.label, x: ax, y: ay, w: actW, h: actH });
 
     // sub-branches positions above/below
-    const yGap = 100;
-    const xGap = 180; // horizontal distance from act to sub
-
+    const yGap = 110;
+    const xGap = 180;
     const subCount = act.subBranches.length;
     const subYs = subCount === 3 ? [ay - yGap, ay, ay + yGap] : [ay - yGap, ay + yGap];
 
     act.subBranches.forEach((sub, idx) => {
       const sx = ax + xGap;
       const sy = subYs[idx % subYs.length];
-      const subNode = { id: sub.id, type: "sub", label: sub.label, x: sx, y: sy, w: subW, h: subH, actId: act.id };
-      nodes.push(subNode);
+      nodes.push({ id: sub.id, type: "sub", label: sub.label, x: sx, y: sy, w: subW, h: subH, actId: act.id });
 
-      // connectors: vertical from act.x to sub.y, then horizontal to sub.x
+      // connectors
       links.push({ type: "vertical", x1: ax, y1: ay, x2: ax, y2: sy });
       links.push({ type: "horizontal", x1: ax, y1: sy, x2: sx - subW / 2, y2: sy });
 
-      // jobs (one per sub currently)
       const jobX = sx + xGap + jobW / 2;
       sub.jobs.forEach((job) => {
         const jx = jobX;
         const jy = sy;
-        const jobNode = {
+        nodes.push({
           id: job.id,
           type: "job",
           label: job.title,
@@ -288,42 +278,30 @@ function computeHorizontalLayout(data, width, height) {
           actId: act.id,
           subId: sub.id,
           payload: job,
-        };
-        nodes.push(jobNode);
-        // straight horizontal connector from sub to job
+        });
         links.push({ type: "horizontal", x1: sx + subW / 2, y1: sy, x2: jx - jobW / 2, y2: sy });
       });
     });
   });
 
-  return { nodes, links, size: { width, height }, cy, spineLeft, spineRight };
+  const neededHeight = cy + 220; // allow space for below content
+  return { nodes, links, size: { width, height: Math.max(height, neededHeight) } };
 }
 
 export default function JourneyMindMap() {
   const containerRef = useRef(null);
   const { width, height } = useContainerSize(containerRef);
-
   const layout = useMemo(() => computeHorizontalLayout(journeyData, width, Math.max(height, 600)), [width, height]);
   const [focus, setFocus] = useState(null);
 
   return (
-    <section className="relative min-h-[100vh] bg-black" data-testid="journey-mindmap-section">
-      <div ref={containerRef} className="relative container mx-auto px-6 py-24">
-        {/* SVG connectors */}
-        <svg className="absolute inset-0 w-full h-full" data-testid="mindmap-svg">
-          {/* Spine and connectors */}
+    <section className="relative bg-black overflow-visible" data-testid="journey-mindmap-section">
+      <div ref={containerRef} className="relative container mx-auto px-6 py-24 overflow-visible" style={{ minHeight: "80vh" }}>
+        {/* SVG connectors (behind) */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" data-testid="mindmap-svg">
           {layout.links.map((l, i) => (
-            <line
-              key={`l-${i}`}
-              x1={l.x1}
-              y1={l.y1}
-              x2={l.x2}
-              y2={l.y2}
-              stroke="#ffffff"
-              strokeWidth={1.5}
-              opacity={0.75}
-            />
-          ))}
+            <line key={`l-${i}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#ffffff" strokeWidth={1.5} opacity={0.75} />)
+          )}
         </svg>
 
         {/* Title */}
@@ -332,8 +310,8 @@ export default function JourneyMindMap() {
           <p className="text-gray-400 text-sm mt-1">Straight, structured, and readable. Click a node for details.</p>
         </div>
 
-        {/* Nodes */}
-        <div className="relative" style={{ height: Math.max(layout.size.height, 600) }} onClick={() => setFocus(null)}>
+        {/* Nodes (on top) */}
+        <div className="relative" style={{ height: layout.size.height }} onClick={() => setFocus(null)}>
           {layout.nodes.map((n) => (
             <Card key={n.id} node={n} w={n.w} h={n.h} onClick={(node) => setFocus(node)} isFocused={focus?.id === n.id} />
           ))}
@@ -394,9 +372,7 @@ export default function JourneyMindMap() {
                   {journeyData.acts
                     .find((a) => a.id === focus.id)
                     ?.subBranches.map((s) => (
-                      <li key={s.id}>
-                        {s.label}
-                      </li>
+                      <li key={s.id}>{s.label}</li>
                     ))}
                 </ul>
               </div>
