@@ -119,11 +119,20 @@ function Portal({ act, onClick }) {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
     >
+      {/* Communication background (blended) */}
       {act.id === "communication" && (
         <div className="absolute inset-0" style={{ backgroundImage: `url('/comm-bg.jpg')`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.26, mixBlendMode: "screen", filter: "saturate(1.05) brightness(0.95)" }} />
       )}
       {act.id === "communication" && (
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55))" }} />
+      )}
+
+      {/* Software background (blended, transparent) */}
+      {act.id === "software" && (
+        <div className="absolute inset-0" style={{ backgroundImage: `url('/software-bg.jpg')`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.24, mixBlendMode: "screen", filter: "saturate(1.05) brightness(0.9)" }} />
+      )}
+      {act.id === "software" && (
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0.5))" }} />
       )}
 
       <motion.span className="pointer-events-none absolute inset-[2px] rounded-[26px] block" style={{ boxShadow: `0 -18px 48px ${act.color}, 0 14px 56px ${act.color}AA` }} />
@@ -200,6 +209,8 @@ function TypewriterPager() {
     "Looking ahead, my vision is to step into leadership roles where I can fully leverage this unique blend of skills. I am passionate about building and leading cross-functional teams to create products that are not only technologically innovative but also strategically marketed and deeply connected to the customer experience. Ultimately, my goal is to drive sustainable growth by ensuring every technical solution serves a clear business purpose.",
   ];
 
+  const DOT_COLORS = [COLORS.blue, COLORS.green, COLORS.amber, COLORS.blue];
+
   const [index, setIndex] = useState(0);
   const [typed, setTyped] = useState("");
   const [typing, setTyping] = useState(true);
@@ -208,7 +219,7 @@ function TypewriterPager() {
     setTyped("");
     setTyping(true);
     const text = pages[index];
-    const speed = 18; // ms per char (fast/techy)
+    const speed = 12; // ms per char (slower)
     let i = 0;
     const id = setInterval(() => {
       i++;
@@ -232,10 +243,10 @@ function TypewriterPager() {
         <AnimatePresence mode="wait">
           <motion.div
             key={`page-${index}`}
-            initial={{ opacity: 0, x: 40, clipPath: "inset(0 0 0 100%)" }}
+            initial={{ opacity: 0, x: 100, clipPath: "inset(0 0 0 100%)" }}
             animate={{ opacity: 1, x: 0, clipPath: "inset(0 0 0 0)" }}
-            exit={{ opacity: 0, x: -80, clipPath: "inset(0 100% 0 0)" }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, x: -220, clipPath: "inset(0 100% 0 0)" }}
+            transition={{ duration: 0.28, ease: [0.83, 0, 0.17, 1] }}
             className="text-white text-base md:text-lg leading-relaxed font-[500]"
           >
             {typed}
@@ -245,7 +256,7 @@ function TypewriterPager() {
       </div>
 
       {/* dots navigator (4 pages) */}
-      <div className="mt-4 flex items-center justify-center gap-2">
+      <div className="mt-5 flex items-center justify-center gap-3">
         {pages.map((_, i) => (
           <button
             key={`dot-${i}`}
@@ -254,21 +265,16 @@ function TypewriterPager() {
             className="relative"
           >
             <span
-              className="block w-[8px] h-[8px] rounded-full"
+              className="block w-[10px] h-[10px] rounded-full"
               style={{
-                background: i === index ? "#ffffff" : "rgba(255,255,255,0.35)",
-                boxShadow: i === index ? "0 0 10px rgba(255,255,255,0.8)" : "none",
+                background: DOT_COLORS[i],
+                opacity: i === index ? 1 : 0.35,
+                boxShadow: i === index ? `0 0 14px ${DOT_COLORS[i]}AA, 0 0 30px ${DOT_COLORS[i]}55` : "none",
+                transition: "opacity 200ms ease",
               }}
             />
           </button>
         ))}
-      </div>
-
-      {/* prev/next helpers */}
-      <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
-        <button onClick={() => go(Math.max(0, index - 1))} className="hover:text-white">Prev</button>
-        <span>•</span>
-        <button onClick={() => go(Math.min(3, index + 1))} className="hover:text-white">Next</button>
       </div>
     </div>
   );
