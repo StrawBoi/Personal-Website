@@ -182,6 +182,7 @@ function Card({ node, w, h, onClick, isFocused }) {
     width: w,
     height: h,
   };
+  const isJob = node.type === "job";
   return (
     <div
       className={`absolute select-none border border-white/25 bg-[rgba(10,10,10,0.7)] shadow-[0_2px_12px_rgba(0,0,0,0.35)] ${
@@ -194,8 +195,15 @@ function Card({ node, w, h, onClick, isFocused }) {
       }}
       data-testid={`mindmap-node-${node.id}`}
     >
-      <div className="h-full w-full p-3 text-left flex items-center">
-        <div className={`${node.type === "act" ? "text-white font-semibold" : "text-white/90"} leading-snug`}>{node.label}</div>
+      <div className="h-full w-full px-3 text-left flex flex-col justify-center">
+        {isJob ? (
+          <>
+            <div className="text-white font-medium leading-tight line-clamp-1">{node.label}</div>
+            <div className="text-gray-400 text-xs leading-tight line-clamp-1">{node.payload?.company}</div>
+          </>
+        ) : (
+          <div className={`${node.type === "act" ? "text-white font-semibold" : "text-white/90"} leading-snug`}>{node.label}</div>
+        )}
       </div>
     </div>
   );
@@ -222,23 +230,18 @@ function computeHorizontalLayout(data, width, height) {
   const nodes = [];
   const links = [];
 
-  const cy = Math.max(280, height * 0.55);
+  const cy = Math.max(220, Math.min(480, height * 0.5));
   const spineLeft = Math.max(40, width * 0.08);
   const spineRight = width - Math.max(40, width * 0.08);
 
-  // Spine (one straight horizontal line)
+  // Spine
   links.push({ type: "spine", x1: spineLeft, y1: cy, x2: spineRight, y2: cy });
 
-  // Place Acts evenly on the spine
   const actXs = [0.2, 0.5, 0.8].map((p) => spineLeft + (spineRight - spineLeft) * p);
-  const actW = 240;
-  const actH = 44;
-  const subW = 220;
-  const subH = 40;
-  const jobW = 300;
-  const jobH = 60;
+  const actW = 240; const actH = 44;
+  const subW = 220; const subH = 40;
+  const jobW = 300; const jobH = 60;
 
-  // center node (left of first act)
   const centerX = spineLeft - 120;
   nodes.push({ id: data.center.id, type: "center", label: data.center.label, x: centerX, y: cy, w: 200, h: 44 });
   links.push({ type: "stub", x1: centerX + 100, y1: cy, x2: spineLeft, y2: cy });
@@ -248,7 +251,6 @@ function computeHorizontalLayout(data, width, height) {
     const ay = cy;
     nodes.push({ id: act.id, type: "act", label: act.label, x: ax, y: ay, w: actW, h: actH });
 
-    // sub-branches positions above/below
     const yGap = 110;
     const xGap = 180;
     const subCount = act.subBranches.length;
@@ -258,8 +260,6 @@ function computeHorizontalLayout(data, width, height) {
       const sx = ax + xGap;
       const sy = subYs[idx % subYs.length];
       nodes.push({ id: sub.id, type: "sub", label: sub.label, x: sx, y: sy, w: subW, h: subH, actId: act.id });
-
-      // connectors
       links.push({ type: "vertical", x1: ax, y1: ay, x2: ax, y2: sy });
       links.push({ type: "horizontal", x1: ax, y1: sy, x2: sx - subW / 2, y2: sy });
 
@@ -267,54 +267,44 @@ function computeHorizontalLayout(data, width, height) {
       sub.jobs.forEach((job) => {
         const jx = jobX;
         const jy = sy;
-        nodes.push({
-          id: job.id,
-          type: "job",
-          label: job.title,
-          x: jx,
-          y: jy,
-          w: jobW,
-          h: jobH,
-          actId: act.id,
-          subId: sub.id,
-          payload: job,
-        });
+        nodes.push({ id: job.id, type: "job", label: job.title, x: jx, y: jy, w: jobW, h: jobH, actId: act.id, subId: sub.id, payload: job });
         links.push({ type: "horizontal", x1: sx + subW / 2, y1: sy, x2: jx - jobW / 2, y2: sy });
       });
     });
   });
 
-  const neededHeight = cy + 220; // allow space for below content
-  return { nodes, links, size: { width, height: Math.max(height, neededHeight) } };
+  const canvasHeight = Math.max(height, cy + 260);
+  return { nodes, links, canvas: { width, height: canvasHeight } };
 }
 
 export default function JourneyMindMap() {
-  const containerRef = useRef(null);
-  const { width, height } = useContainerSize(containerRef);
-  const layout = useMemo(() => computeHorizontalLayout(journeyData, width, Math.max(height, 600)), [width, height]);
+  const canvasRef = useRef(null);
+  const { width, height } = useContainerSize(canvasRef);
+  const layout = useMemo(() => computeHorizontalLayout(journeyData, width || 1200, height || 600), [width, height]);
   const [focus, setFocus] = useState(null);
 
   return (
-    <section className="relative bg-black overflow-visible" data-testid="journey-mindmap-section">
-      <div ref={containerRef} className="relative container mx-auto px-6 py-24 overflow-visible" style={{ minHeight: "80vh" }}>
-        {/* SVG connectors (behind) */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" data-testid="mindmap-svg">
-          {layout.links.map((l, i) => (
-            <line key={`l-${i}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#ffffff" strokeWidth={1.5} opacity={0.75} />)
-          )}
-        </svg>
-
+    <section className="relative bg-black" data-testid="journey-mindmap-section">
+      <div className="container mx-auto px-6 py-16">
         {/* Title */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide">My Journey — Mind Map</h2>
           <p className="text-gray-400 text-sm mt-1">Straight, structured, and readable. Click a node for details.</p>
         </div>
 
-        {/* Nodes (on top) */}
-        <div className="relative" style={{ height: layout.size.height }} onClick={() => setFocus(null)}>
-          {layout.nodes.map((n) => (
-            <Card key={n.id} node={n} w={n.w} h={n.h} onClick={(node) => setFocus(node)} isFocused={focus?.id === n.id} />
-          ))}
+        {/* Canvas (both SVG and nodes share the same origin) */}
+        <div ref={canvasRef} className="relative w-full" style={{ minHeight: 720, height: layout.canvas.height }}>
+          <svg className="absolute inset-0 w-full h-full" data-testid="mindmap-svg">
+            {layout.links.map((l, i) => (
+              <line key={`l-${i}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#ffffff" strokeWidth={1.5} opacity={0.8} />
+            ))}
+          </svg>
+
+          <div className="absolute inset-0" onClick={() => setFocus(null)}>
+            {layout.nodes.map((n) => (
+              <Card key={n.id} node={n} w={n.w} h={n.h} onClick={(node) => setFocus(node)} isFocused={focus?.id === n.id} />
+            ))}
+          </div>
         </div>
       </div>
 
