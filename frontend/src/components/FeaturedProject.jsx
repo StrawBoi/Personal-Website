@@ -92,11 +92,11 @@ export default function FeaturedProject() {
             playsInline 
           />
           
-          {/* Subtle vignette overlay */}
-          <div 
-            className="absolute inset-0 pointer-events-none" 
+          {/* Dynamic dimming layer - strong when small, fades when maximized */}
+          <motion.div 
+            className="absolute inset-0 pointer-events-none bg-black" 
             style={{ 
-              background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%)',
+              opacity: dimmingOpacity,
               borderRadius: 'inherit'
             }} 
           />
