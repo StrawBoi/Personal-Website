@@ -103,24 +103,24 @@ export default function FeaturedProject() {
         </motion.div>
       </div>
 
-      {/* Post-video content (not pinned) */}
-      <div className="relative bg-black pt-20 pb-16">
+      {/* Post-video content (not pinned) - transparent/dimmed background */}
+      <div className="relative pt-20 pb-16" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(10px)' }}>
         <div className="container mx-auto px-6" data-testid="post-video-content">
           <div className="max-w-5xl mx-auto text-center mb-12">
-            <h3 className="text-white text-xl md:text-2xl font-bold">
+            <h3 className="text-white text-xl md:text-2xl font-bold drop-shadow-lg">
               How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
             </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-            <div className="rounded-2xl border border-emerald-400/50 bg-black/40 p-5 text-white">
+            <div className="rounded-2xl border border-emerald-400/50 p-5 text-white" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
               <h5 className="font-semibold mb-2">Module 1: Data Collection Core</h5>
               <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
                 <li>Automated product price & stock tracking from URLs</li>
                 <li>Continuous updates for real-time market view</li>
               </ul>
             </div>
-            <div className="rounded-2xl border border-emerald-400/50 bg-black/40 p-5 text-white">
+            <div className="rounded-2xl border border-emerald-400/50 p-5 text-white" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
               <h5 className="font-semibold mb-2">Module 2: Analysis & Visualization Hub</h5>
               <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
                 <li>Historical Price Trend (line)</li>
@@ -129,7 +129,7 @@ export default function FeaturedProject() {
                 <li>Price vs Popularity (scatter)</li>
               </ul>
             </div>
-            <div className="rounded-2xl border border-emerald-400/50 bg-black/40 p-5 text-white">
+            <div className="rounded-2xl border border-emerald-400/50 p-5 text-white" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
               <h5 className="font-semibold mb-2">Module 3: AI Insight Layer</h5>
               <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
                 <li>Anomaly detection</li>
@@ -137,7 +137,7 @@ export default function FeaturedProject() {
                 <li>Actionable recommendations</li>
               </ul>
             </div>
-            <div className="rounded-2xl border border-emerald-400/50 bg-black/40 p-5 text-white">
+            <div className="rounded-2xl border border-emerald-400/50 p-5 text-white" style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}>
               <h5 className="font-semibold mb-2">Module 4: User-Centric Tools</h5>
               <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
                 <li>User accounts & saved products</li>
