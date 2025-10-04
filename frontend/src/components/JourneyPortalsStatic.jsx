@@ -318,11 +318,21 @@ function CinematicModal({ open, onClose, act }) {
                   </motion.div>
 
                   {/* Job Experience Cards */}
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 1.1 }}
+                  >
                     <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Professional Experience</h3>
                     <div className="space-y-4">
                       {act.details.jobs.map((job, idx) => (
-                        <div key={`job-${idx}`} className="border border-gray-700/50 rounded-lg p-4 bg-black/30 hover:bg-black/40 transition-colors">
+                        <motion.div 
+                          key={`job-${idx}`} 
+                          className="border border-gray-700/50 rounded-lg p-4 bg-black/30 hover:bg-black/40 transition-colors"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: 1.2 + idx * 0.1 }}
+                        >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                               <h4 className="text-lg font-semibold text-white">{job.role}</h4>
@@ -333,10 +343,10 @@ function CinematicModal({ open, onClose, act }) {
                               <div className="w-12 h-12 mt-2 rounded-lg bg-gray-800/50 border border-gray-700/50 flex items-center justify-center text-gray-500 text-xs">Logo</div>
                             </div>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               ) : (
                 // Placeholder for Act II and III
