@@ -285,21 +285,37 @@ function CinematicModal({ open, onClose, act }) {
                   </motion.div>
 
                   {/* Job Responsibilities - Two columns */}
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                  >
                     <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Job Responsibilities</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-gray-300">
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Internal Communication</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Frontline Customer Interaction & Case Management</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Ticket Management</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Prioritize Inquiries</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Identify Knowledge Gaps</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Maintain Detailed Records</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Problem-Solving & Troubleshooting</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Active Listening and Issue Diagnosis</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>Technical Troubleshooting</div>
-                      <div className="flex items-start"><span className="text-teal-400 mr-2">•</span>De-escalation</div>
+                      {[
+                        "Internal Communication",
+                        "Frontline Customer Interaction & Case Management",
+                        "Ticket Management",
+                        "Prioritize Inquiries",
+                        "Identify Knowledge Gaps",
+                        "Maintain Detailed Records",
+                        "Problem-Solving & Troubleshooting",
+                        "Active Listening and Issue Diagnosis",
+                        "Technical Troubleshooting",
+                        "De-escalation"
+                      ].map((resp, i) => (
+                        <motion.div 
+                          key={i}
+                          className="flex items-start"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: 0.9 + i * 0.03 }}
+                        >
+                          <span className="text-teal-400 mr-2">•</span>{resp}
+                        </motion.div>
+                      ))}
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Job Experience Cards */}
                   <div>
