@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/bnkz1nlp_A_cinematic_slowmotion_202510012318_6b5ws.mp4";
+const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_code-evolution-11/artifacts/3rhdwenn_A_cinematic_slowmotion_202510041528.mp4";
 
 const CinematicHero = () => {
   return (
