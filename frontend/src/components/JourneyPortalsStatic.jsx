@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const COLORS = { blue: "#00BFFF", green: "#34d399", amber: "#f59e0b" };
+const COLORS = { blue: "#00BFFF", green: "#34d399", amber: "#f59e0b", teal: "#14b8a6" };
 
 const ACTS = [
   {
@@ -179,8 +179,8 @@ function CinematicModal({ open, onClose, act }) {
             </div>
             <div className="relative z-10 h-full w-full flex items-end">
               <div className="w-full p-6">
-                <div className="text-gray-300 text-sm uppercase tracking-widest">Overview</div>
-                <div className="mt-2 text-white text-base md:text-lg">[Placeholder content — story details will appear here.]</div>
+                <div className="text-gray-300 text-lg uppercase tracking-widest">Overview</div>
+                <div className="mt-2 text-white text-base md:text-xl">[Placeholder content — story details will appear here.]</div>
               </div>
             </div>
           </motion.div>
@@ -208,7 +208,7 @@ function TypewriterPager() {
     setTyped("");
     setTyping(true);
     const text = pages[index];
-    const speed = 5;
+    const speed = 25; // 5x slower than previous 5ms
     let i = 0;
     const id = setInterval(() => {
       i++;
@@ -222,7 +222,12 @@ function TypewriterPager() {
 
   return (
     <div className="relative max-w-5xl mx-auto mb-12" data-testid="journey-typewriter">
-      <div className="min-h-[180px]">
+      {/* greenish neon accent line under heading */}
+      <div className="flex items-center justify-center mb-5">
+        <div className="w-[2px] h-6" style={{ background: COLORS.teal, boxShadow: `0 0 12px ${COLORS.teal}` }} />
+      </div>
+
+      <div className="min-h-[200px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={`page-${index}`}
@@ -230,17 +235,34 @@ function TypewriterPager() {
             animate={{ opacity: 1, x: 0, clipPath: "inset(0 0 0 0)" }}
             exit={{ opacity: 0, x: -260, clipPath: "inset(0 100% 0 0)" }}
             transition={{ duration: 0.24, ease: [0.83, 0, 0.17, 1] }}
-            className="text-white text-[17px] md:text-[19px] leading-relaxed font-[500]"
+            className="text-white text-[19px] md:text-[22px] leading-relaxed font-[500]"
           >
             {typed}
             {typing && <span className="inline-block w-[10px] h-[20px] bg-white ml-1 align-[-3px] animate-pulse" />}
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className="mt-5 flex items-center justify-center gap-4">
+
+      {/* dots navigator */}
+      <div className="mt-6 flex items-center justify-center gap-6">
         {pages.map((_, i) => (
-          <button key={`dot-${i}`} onClick={() => go(i)} aria-label={`Go to paragraph ${i + 1}`} className="relative">
-            <span className="block w-[18px] h-[18px] rounded-full" style={{ background: DOT_COLORS[i], opacity: i === index ? 1 : 0.35, boxShadow: i === index ? `0 0 16px ${DOT_COLORS[i]}AA, 0 0 36px ${DOT_COLORS[i]}55` : 'none', transition: 'opacity 200ms ease' }} />
+          <button
+            key={`dot-${i}`}
+            onClick={() => go(i)}
+            aria-label={`Go to paragraph ${i + 1}`}
+            className="relative outline-none focus:outline-none border-0 bg-transparent p-0"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            <span
+              className="block rounded-full"
+              style={{
+                width: 24, height: 24,
+                background: DOT_COLORS[i],
+                opacity: i === index ? 1 : 0.32,
+                boxShadow: i === index ? `0 0 18px ${DOT_COLORS[i]}AA, 0 0 40px ${DOT_COLORS[i]}55` : `0 0 8px ${DOT_COLORS[i]}33`,
+                transition: 'opacity 200ms ease, box-shadow 200ms ease',
+              }}
+            />
           </button>
         ))}
       </div>
@@ -253,26 +275,20 @@ export default function JourneyPortalsStatic() {
   const sectionRef = useRef(null);
   const [pathD, setPathD] = useState("M 120 300 C 380 220 620 380 880 280");
 
-  // Align data stream through portal centers
   useEffect(() => {
     const compute = () => {
-      const sec = sectionRef.current;
-      if (!sec) return;
-      const row = sec.querySelector('#portal-row');
-      if (!row) return;
-      const portals = Array.from(row.querySelectorAll('.portal-btn'));
-      if (portals.length < 3) return;
+      const sec = sectionRef.current; if (!sec) return;
+      const row = sec.querySelector('#portal-row'); if (!row) return;
+      const portals = Array.from(row.querySelectorAll('.portal-btn')); if (portals.length < 3) return;
       const srect = sec.getBoundingClientRect();
       const pts = portals.map((el) => {
         const r = el.getBoundingClientRect();
         const cx = r.left + r.width / 2 - srect.left;
-        const cy = r.top + r.height * 0.75 - srect.top; // 3/4 height for a lower pass
+        const cy = r.top + r.height * 0.75 - srect.top;
         return { x: cx, y: cy };
       });
-      const sx = 1000 / srect.width;
-      const sy = 420 / srect.height;
+      const sx = 1000 / srect.width; const sy = 420 / srect.height;
       const P = pts.map((p) => ({ x: p.x * sx, y: p.y * sy }));
-      // Build cubic spline M P0 C ... S ... P2
       const p0 = P[0], p1 = P[1], p2 = P[2];
       const c1 = { x: p0.x + (p1.x - p0.x) / 3, y: p0.y - (p1.y - p0.y) * 0.25 };
       const c2 = { x: p0.x + (p1.x - p0.x) * 2 / 3, y: p0.y + (p1.y - p0.y) * 0.25 };
@@ -280,7 +296,6 @@ export default function JourneyPortalsStatic() {
       const d = `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} C ${c1.x.toFixed(1)},${c1.y.toFixed(1)} ${c2.x.toFixed(1)},${c2.y.toFixed(1)} ${p1.x.toFixed(1)},${p1.y.toFixed(1)} S ${c3.x.toFixed(1)},${c3.y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
       setPathD(d);
     };
-    // compute after paint
     const id = requestAnimationFrame(compute);
     window.addEventListener('resize', compute);
     return () => { cancelAnimationFrame(id); window.removeEventListener('resize', compute); };
