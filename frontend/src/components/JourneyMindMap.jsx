@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Content model derived from user-provided data
+// Data from user
 const journeyData = {
   center: { id: "center", label: "My Journey" },
   acts: [
@@ -122,7 +122,6 @@ const journeyData = {
             },
           ],
         },
-        // third branch intentionally omitted per user request (can add later)
       ],
     },
     {
@@ -176,263 +175,172 @@ const journeyData = {
   ],
 };
 
-// Layout helpers
-const degToRad = (d) => (d * Math.PI) / 180;
-
-function computeLayout(data, canvas) {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-  const center = { x: cx, y: cy };
-
-  const actRadius = 360;
-  const subRadius = 210;
-  const jobRadius = 150;
-
-  // Place acts at 3 angles for clarity
-  const actAngles = {
-    communication: -20,
-    software: 200,
-    marketing: 110,
-  };
-
-  const nodes = [];
-  const links = [];
-
-  // Center
-  nodes.push({ id: data.center.id, type: "center", label: data.center.label, x: center.x, y: center.y });
-
-  data.acts.forEach((act) => {
-    const a = actAngles[act.id] ?? 0;
-    const ax = cx + actRadius * Math.cos(degToRad(a));
-    const ay = cy + actRadius * Math.sin(degToRad(a));
-
-    nodes.push({ id: act.id, type: "act", label: act.label, x: ax, y: ay });
-    links.push({ from: data.center.id, to: act.id });
-
-    // Sub-branches around act direction
-    const offsets = act.subBranches.length === 3 ? [-24, 0, 24] : [-16, 16];
-
-    act.subBranches.forEach((sub, idx) => {
-      const sa = a + offsets[idx % offsets.length];
-      const sx = ax + subRadius * Math.cos(degToRad(sa));
-      const sy = ay + subRadius * Math.sin(degToRad(sa));
-
-      nodes.push({ id: sub.id, type: "sub", label: sub.label, x: sx, y: sy, actId: act.id });
-      links.push({ from: act.id, to: sub.id });
-
-      // Jobs radiate from sub
-      const jobOffsets = sub.jobs.length === 1 ? [0] : sub.jobs.length === 2 ? [-12, 12] : [-18, 0, 18];
-      sub.jobs.forEach((job, jdx) => {
-        const ja = sa + jobOffsets[jdx % jobOffsets.length];
-        const jx = sx + jobRadius * Math.cos(degToRad(ja));
-        const jy = sy + jobRadius * Math.sin(degToRad(ja));
-        nodes.push({
-          id: job.id,
-          type: "job",
-          label: job.title,
-          x: jx,
-          y: jy,
-          actId: act.id,
-          subId: sub.id,
-          payload: job,
-        });
-        links.push({ from: sub.id, to: job.id });
-      });
-    });
-  });
-
-  return { nodes, links, center };
-}
-
-function curvedPath(from, to) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-  const normX = dx / dist;
-  const normY = dy / dist;
-
-  const curve = Math.min(120, dist / 3);
-  const cx1 = from.x + normX * curve - normY * (curve * 0.35);
-  const cy1 = from.y + normY * curve + normX * (curve * 0.35);
-  const cx2 = to.x - normX * curve + normY * (curve * 0.35);
-  const cy2 = to.y - normY * curve - normX * (curve * 0.35);
-
-  return `M ${from.x},${from.y} C ${cx1},${cy1} ${cx2},${cy2} ${to.x},${to.y}`;
-}
-
-function Node({ node, isFocused, onFocus }) {
+// Node card component (sharp edges, clean text)
+function Card({ node, w, h, onClick, isFocused }) {
   const style = {
-    left: node.x - 80,
-    top: node.y - 20,
-    width: 160,
+    left: node.x - w / 2,
+    top: node.y - h / 2,
+    width: w,
+    height: h,
   };
-
-  const labelClass =
-    node.type === "center"
-      ? "text-white/90 font-semibold text-lg"
-      : node.type === "act"
-      ? "text-white font-semibold"
-      : "text-white/90";
-
   return (
     <div
-      className={`absolute select-none px-3 py-2 rounded-full border border-white/20 bg-[rgba(12,12,12,0.55)] ${
-        isFocused ? "shadow-[0_0_0_2px_rgba(255,255,255,0.14)]" : ""
+      className={`absolute select-none border border-white/25 bg-[rgba(10,10,10,0.7)] shadow-[0_2px_12px_rgba(0,0,0,0.35)] ${
+        isFocused ? "outline outline-2 outline-white/30" : ""
       }`}
       style={style}
       onClick={(e) => {
         e.stopPropagation();
-        onFocus?.(node);
+        onClick?.(node);
       }}
       data-testid={`mindmap-node-${node.id}`}
     >
-      <div className={labelClass} style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
-        {node.label}
+      <div className="h-full w-full p-3 text-left flex items-center">
+        <div className={`${node.type === "act" ? "text-white font-semibold" : "text-white/90"} leading-snug`}>{node.label}</div>
       </div>
     </div>
   );
 }
 
+function useContainerSize(ref) {
+  const [size, setSize] = useState({ width: 1200, height: 600 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const rect = el.getBoundingClientRect();
+      setSize({ width: rect.width, height: rect.height });
+    });
+    ro.observe(el);
+    const rect = el.getBoundingClientRect();
+    setSize({ width: rect.width, height: rect.height });
+    return () => ro.disconnect();
+  }, [ref]);
+  return size;
+}
+
+function computeHorizontalLayout(data, width, height) {
+  const nodes = [];
+  const links = [];
+
+  const cx = width / 2;
+  const cy = Math.max(280, height * 0.55);
+
+  const spineLeft = Math.max(40, width * 0.08);
+  const spineRight = width - Math.max(40, width * 0.08);
+
+  // Spine (one straight horizontal line)
+  links.push({ type: "spine", x1: spineLeft, y1: cy, x2: spineRight, y2: cy });
+
+  // Place Acts evenly on the spine
+  const actXs = [0.2, 0.5, 0.8].map((p) => spineLeft + (spineRight - spineLeft) * p);
+  const actW = 220;
+  const actH = 44;
+  const subW = 200;
+  const subH = 40;
+  const jobW = 260;
+  const jobH = 56;
+
+  // optional center node (left of first act)
+  const centerX = spineLeft - 120;
+  nodes.push({ id: data.center.id, type: "center", label: data.center.label, x: centerX, y: cy, w: 180, h: 44 });
+  links.push({ type: "stub", x1: centerX + 90, y1: cy, x2: spineLeft, y2: cy });
+
+  data.acts.forEach((act, i) => {
+    const ax = actXs[i] ?? cx;
+    const ay = cy;
+    const actNode = { id: act.id, type: "act", label: act.label, x: ax, y: ay, w: actW, h: actH };
+    nodes.push(actNode);
+
+    // vertical tap from spine to act (tiny, for clarity)
+    links.push({ type: "stub", x1: ax, y1: cy - 16, x2: ax, y2: cy + 16 });
+
+    // sub-branches positions above/below
+    const yGap = 100;
+    const xGap = 180; // horizontal distance from act to sub
+
+    const subCount = act.subBranches.length;
+    const subYs = subCount === 3 ? [ay - yGap, ay, ay + yGap] : [ay - yGap, ay + yGap];
+
+    act.subBranches.forEach((sub, idx) => {
+      const sx = ax + xGap;
+      const sy = subYs[idx % subYs.length];
+      const subNode = { id: sub.id, type: "sub", label: sub.label, x: sx, y: sy, w: subW, h: subH, actId: act.id };
+      nodes.push(subNode);
+
+      // connectors: vertical from act.x to sub.y, then horizontal to sub.x
+      links.push({ type: "vertical", x1: ax, y1: ay, x2: ax, y2: sy });
+      links.push({ type: "horizontal", x1: ax, y1: sy, x2: sx - subW / 2, y2: sy });
+
+      // jobs (one per sub currently)
+      const jobX = sx + xGap + jobW / 2;
+      sub.jobs.forEach((job) => {
+        const jx = jobX;
+        const jy = sy;
+        const jobNode = {
+          id: job.id,
+          type: "job",
+          label: job.title,
+          x: jx,
+          y: jy,
+          w: jobW,
+          h: jobH,
+          actId: act.id,
+          subId: sub.id,
+          payload: job,
+        };
+        nodes.push(jobNode);
+        // straight horizontal connector from sub to job
+        links.push({ type: "horizontal", x1: sx + subW / 2, y1: sy, x2: jx - jobW / 2, y2: sy });
+      });
+    });
+  });
+
+  return { nodes, links, size: { width, height }, cy, spineLeft, spineRight };
+}
+
 export default function JourneyMindMap() {
-  const viewportRef = useRef(null);
-  const canvas = { width: 2200, height: 1400 };
+  const containerRef = useRef(null);
+  const { width, height } = useContainerSize(containerRef);
 
-  const { nodes, links, center } = useMemo(() => computeLayout(journeyData, canvas), []);
-  const nodeById = useMemo(() => Object.fromEntries(nodes.map((n) => [n.id, n])), [nodes]);
-
-  // Pan & zoom state
-  const [scale, setScale] = useState(0.95);
-  const [tx, setTx] = useState(0);
-  const [ty, setTy] = useState(0);
-  const [drag, setDrag] = useState({ active: false, sx: 0, sy: 0, stx: 0, sty: 0 });
+  const layout = useMemo(() => computeHorizontalLayout(journeyData, width, Math.max(height, 600)), [width, height]);
   const [focus, setFocus] = useState(null);
 
-  // Initialize to center the canvas
-  useEffect(() => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-    const rect = vp.getBoundingClientRect();
-    const cxView = rect.width / 2;
-    const cyView = rect.height / 2;
-    setTx(cxView - scale * center.x);
-    setTy(cyView - scale * center.y);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Wheel zoom only when Ctrl/Cmd is held so page scroll works normally
-  useEffect(() => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-
-    const onWheel = (e) => {
-      if (!(e.ctrlKey || e.metaKey)) {
-        // allow normal page scrolling
-        return;
-      }
-      e.preventDefault();
-      const delta = e.deltaY;
-      const factor = Math.pow(1.1, -delta / 100);
-      const oldScale = scale;
-      const newScale = Math.max(0.6, Math.min(1.6, oldScale * factor));
-      if (newScale === oldScale) return;
-
-      const rect = vp.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const cy = e.clientY - rect.top;
-
-      const nx = cx - ((cx - tx) * newScale) / oldScale;
-      const ny = cy - ((cy - ty) * newScale) / oldScale;
-      setTx(nx);
-      setTy(ny);
-      setScale(newScale);
-    };
-
-    vp.addEventListener("wheel", onWheel, { passive: false });
-    return () => vp.removeEventListener("wheel", onWheel);
-  }, [scale, tx, ty]);
-
-  // Drag panning
-  useEffect(() => {
-    const vp = viewportRef.current;
-    if (!vp) return;
-
-    const onDown = (e) => {
-      setDrag({ active: true, sx: e.clientX, sy: e.clientY, stx: tx, sty: ty });
-    };
-    const onMove = (e) => {
-      if (!drag.active) return;
-      const dx = e.clientX - drag.sx;
-      const dy = e.clientY - drag.sy;
-      setTx(drag.stx + dx);
-      setTy(drag.sty + dy);
-    };
-    const onUp = () => setDrag((d) => ({ ...d, active: false }));
-
-    vp.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
-    return () => {
-      vp.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-    };
-  }, [drag.active, drag.sx, drag.sy, drag.stx, drag.sty, tx, ty]);
-
-  const focusOn = (node) => {
-    if (!viewportRef.current) return;
-    const rect = viewportRef.current.getBoundingClientRect();
-    const cxView = rect.width / 2;
-    const cyView = rect.height / 2;
-    const nx = cxView - scale * node.x;
-    const ny = cyView - scale * node.y;
-    setTx(nx);
-    setTy(ny);
-    setFocus(node);
-  };
-
-  const svgPaths = useMemo(() => {
-    return links.map((l, i) => {
-      const from = nodeById[l.from];
-      const to = nodeById[l.to];
-      const d = curvedPath(from, to);
-      return (
-        <path
-          key={`link-${i}`}
-          d={d}
-          stroke="#ffffff"
-          strokeWidth={2}
-          fill="none"
-          opacity={0.7}
-        />
-      );
-    });
-  }, [links, nodeById]);
-
   return (
-    <section className="relative h-[120vh] bg-black" data-testid="journey-mindmap-section">
-      <div className="absolute inset-0" ref={viewportRef}>
-        <motion.div
-          className="origin-top-left"
-          animate={{ x: tx, y: ty, scale }}
-          transition={{ type: "spring", stiffness: 200, damping: 26 }}
-          style={{ width: canvas.width, height: canvas.height }}
-          onClick={() => setFocus(null)}
-        >
-          <svg width={canvas.width} height={canvas.height} className="absolute top-0 left-0" data-testid="mindmap-svg">
-            {svgPaths}
-          </svg>
-
-          {nodes.map((n) => (
-            <Node key={n.id} node={n} isFocused={focus?.id === n.id} onFocus={(node) => focusOn(node)} />
+    <section className="relative min-h-[100vh] bg-black" data-testid="journey-mindmap-section">
+      <div ref={containerRef} className="relative container mx-auto px-6 py-24">
+        {/* SVG connectors */}
+        <svg className="absolute inset-0 w-full h-full" data-testid="mindmap-svg">
+          {/* Spine and connectors */}
+          {layout.links.map((l, i) => (
+            <line
+              key={`l-${i}`}
+              x1={l.x1}
+              y1={l.y1}
+              x2={l.x2}
+              y2={l.y2}
+              stroke="#ffffff"
+              strokeWidth={1.5}
+              opacity={0.75}
+            />
           ))}
-        </motion.div>
+        </svg>
+
+        {/* Title */}
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide">My Journey — Mind Map</h2>
+          <p className="text-gray-400 text-sm mt-1">Straight, structured, and readable. Click a node for details.</p>
+        </div>
+
+        {/* Nodes */}
+        <div className="relative" style={{ height: Math.max(layout.size.height, 600) }} onClick={() => setFocus(null)}>
+          {layout.nodes.map((n) => (
+            <Card key={n.id} node={n} w={n.w} h={n.h} onClick={(node) => setFocus(node)} isFocused={focus?.id === n.id} />
+          ))}
+        </div>
       </div>
 
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 text-center">
-        <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-wide">My Journey — Mind Map</h2>
-        <p className="text-gray-400 text-sm mt-1">Drag to pan • Hold Ctrl/Cmd + scroll to zoom • Click nodes for details</p>
-      </div>
-
+      {/* Details panel */}
       <AnimatePresence>
         {focus && (
           <motion.aside
@@ -441,13 +349,13 @@ export default function JourneyMindMap() {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: 360, opacity: 0 }}
             transition={{ type: "spring", stiffness: 220, damping: 26 }}
-            className="hidden xl:block absolute right-6 top-6 bottom-6 w-[360px] rounded-xl border border-white/10 bg-black/70 backdrop-blur-md p-5 overflow-y-auto"
+            className="hidden xl:block absolute right-6 top-6 bottom-6 w-[360px] rounded-none border border-white/10 bg-black/80 backdrop-blur-md p-5 overflow-y-auto"
             data-testid="mindmap-detail-panel"
           >
-            <div className="text-xs uppercase tracking-wider text-gray-400">Details</div>
             {focus.type === "job" ? (
               <div>
-                <div className="mt-2 text-white text-lg font-semibold">{focus.payload.title}</div>
+                <div className="text-xs uppercase tracking-wider text-gray-400">Role</div>
+                <div className="mt-1 text-white text-lg font-semibold">{focus.payload.title}</div>
                 <div className="text-gray-300">{focus.payload.company}</div>
                 <div className="text-gray-500 text-sm">{focus.payload.period}</div>
                 <p className="mt-3 text-gray-300 leading-relaxed">{focus.payload.summary}</p>
@@ -459,17 +367,13 @@ export default function JourneyMindMap() {
                     ))}
                   </ul>
                 </div>
-                <div className="mt-4 text-sm text-emerald-300/90">
-                  Skills: {focus.payload.skills}
-                </div>
+                <div className="mt-4 text-sm text-gray-300">Skills: {focus.payload.skills}</div>
               </div>
             ) : focus.type === "sub" ? (
               <div>
-                <div className="mt-2 text-white text-lg font-semibold">{focus.label}</div>
-                <div className="text-gray-400 text-sm">
-                  {focus.actId ? journeyData.acts.find((a) => a.id === focus.actId)?.label : ""}
-                </div>
-                <div className="mt-3 text-gray-300 text-sm">Jobs in this branch:</div>
+                <div className="text-xs uppercase tracking-wider text-gray-400">Branch</div>
+                <div className="mt-1 text-white text-lg font-semibold">{focus.label}</div>
+                <div className="mt-2 text-gray-300 text-sm">Jobs in this branch:</div>
                 <ul className="mt-2 space-y-1 text-gray-200 text-sm">
                   {journeyData.acts
                     .find((a) => a.id === focus.actId)
@@ -483,22 +387,24 @@ export default function JourneyMindMap() {
               </div>
             ) : focus.type === "act" ? (
               <div>
-                <div className="mt-2 text-white text-lg font-semibold">{focus.label}</div>
-                <div className="mt-3 text-gray-300 text-sm">Branches</div>
+                <div className="text-xs uppercase tracking-wider text-gray-400">Act</div>
+                <div className="mt-1 text-white text-lg font-semibold">{focus.label}</div>
+                <div className="mt-2 text-gray-300 text-sm">Branches</div>
                 <ul className="mt-2 space-y-1 text-gray-200 text-sm">
                   {journeyData.acts
                     .find((a) => a.id === focus.id)
                     ?.subBranches.map((s) => (
                       <li key={s.id}>
-                        {s.label} ({s.jobs.length} job{s.jobs.length !== 1 ? "s" : ""})
+                        {s.label}
                       </li>
                     ))}
                 </ul>
               </div>
             ) : (
               <div>
-                <div className="mt-2 text-white text-lg font-semibold">My Journey</div>
-                <div className="mt-2 text-gray-300 text-sm">Click any node to focus. Hold Ctrl/Cmd + scroll to zoom; drag to pan.</div>
+                <div className="text-xs uppercase tracking-wider text-gray-400">Overview</div>
+                <div className="mt-1 text-white text-lg font-semibold">My Journey</div>
+                <p className="mt-2 text-gray-300 text-sm">Click any node to focus.</p>
               </div>
             )}
           </motion.aside>
