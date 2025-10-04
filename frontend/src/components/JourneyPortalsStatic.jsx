@@ -88,15 +88,16 @@ function DataStream() {
         </filter>
       </defs>
 
-      <path id="streamPath" d="M 120 300 C 280 160 420 160 500 280 S 760 400 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="14" opacity="0.25" filter="url(#glowBlur)" />
-      <path d="M 120 300 C 280 160 420 160 500 280 S 760 400 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="3" opacity="0.85" />
-      <path d="M 120 300 C 280 160 420 160 500 280 S 760 400 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="4" strokeDasharray="16 26" opacity="0.8">
+      {/* Curve anchors will map to portal centers via JS after mount */}
+      <path id="streamPath" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="14" opacity="0.25" filter="url(#glowBlur)" />
+      <path id="streamMain" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="3" opacity="0.88" />
+      <path id="streamDash" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="4" strokeDasharray="16 26" opacity="0.85">
         <animate attributeName="stroke-dashoffset" from="0" to="-200" dur="3s" repeatCount="indefinite" />
       </path>
       {[0, 0.33, 0.66].map((delay, idx) => (
         <circle key={`p-${idx}`} r="4" fill="#ffffff">
           <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear" begin={`${delay}s`}>
-            <mpath xlinkHref="#streamPath" />
+            <mpath xlinkHref="#streamMain" />
           </animateMotion>
         </circle>
       ))}
@@ -108,7 +109,7 @@ function Portal({ act, onClick }) {
   return (
     <motion.button
       onClick={onClick}
-      className="relative rounded-[28px] border bg-[rgba(10,10,12,0.55)] overflow-hidden"
+      className="portal-btn relative rounded-[28px] border bg-[rgba(10,10,12,0.55)] overflow-hidden"
       style={{
         width: "clamp(260px, 28vw, 360px)",
         height: "clamp(380px, 56vh, 520px)",
@@ -119,7 +120,6 @@ function Portal({ act, onClick }) {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Communication background (blended) */}
       {act.id === "communication" && (
         <div className="absolute inset-0" style={{ backgroundImage: `url('/comm-bg.jpg')`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.26, mixBlendMode: "screen", filter: "saturate(1.05) brightness(0.95)" }} />
       )}
@@ -127,11 +127,17 @@ function Portal({ act, onClick }) {
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55))" }} />
       )}
 
-      {/* Software background (blended, transparent) */}
       {act.id === "software" && (
         <div className="absolute inset-0" style={{ backgroundImage: `url('/software-bg.jpg')`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.24, mixBlendMode: "screen", filter: "saturate(1.05) brightness(0.9)" }} />
       )}
       {act.id === "software" && (
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0.5))" }} />
+      )}
+
+      {act.id === "marketing" && (
+        <div className="absolute inset-0" style={{ backgroundImage: `url('/marketing-bg.jpg')`, backgroundSize: "cover", backgroundPosition: "center", opacity: 0.24, mixBlendMode: "screen", filter: "saturate(1.05) brightness(0.9)" }} />
+      )}
+      {act.id === "marketing" && (
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0.5))" }} />
       )}
 
@@ -158,42 +164,29 @@ function CinematicModal({ open, onClose, act }) {
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[90] flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <div className="absolute inset-0 bg-black/80" onClick={onClose} />
-          <motion.div className="relative w-[min(1080px,92vw)] h-[min(86vh,820px)] rounded-2xl border border-white/10 bg-[rgba(10,10,12,0.96)] overflow-hidden text-white" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }} transition={{ type: "spring", stiffness: 220, damping: 26 }} style={{ boxShadow: `0 0 40px ${act?.color}3a, inset 0 0 24px ${act?.color}25` }}>
-            <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} style={{ background: "radial-gradient(1000px 400px at 50% 10%, rgba(255,255,255,0.06), transparent 60%)" }} />
-            <motion.div className="absolute top-0 bottom-0 left-[-30%] w-[30%]" initial={{ opacity: 0, x: -200 }} animate={{ opacity: 0.6, x: [ -200, 1200 ] }} transition={{ duration: 1.2, ease: "easeInOut", delay: 0.1 }} style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)" }} />
-            <div className="relative z-10 px-6 py-5 border-b border-white/10 flex items-center justify-between">
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.4 }} className="text-white font-semibold text-lg">Entering {act?.title}</motion.div>
-              <button onClick={onClose} className="text-gray-300 hover:text-white">Close</button>
+          <div className="absolute inset-0 bg-black/85" onClick={onClose} />
+          <motion.div className="relative w-[min(1080px,92vw)] h-[min(86vh,820px)] rounded-2xl border overflow-hidden text-white"
+            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }} transition={{ type: "spring", stiffness: 240, damping: 26 }}
+            style={{
+              background: "rgba(10,10,12,0.96)",
+              boxShadow: `0 0 0 2px ${act?.color}AA, 0 0 36px ${act?.color}AA, 0 0 72px ${act?.color}55, inset 0 0 24px ${act?.color}22`,
+            }}
+          >
+            {/* inner neon rim */}
+            <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: `inset 0 0 60px ${act?.color}22` }} />
+            {/* title center */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.h3 initial={{ letterSpacing: "0.05em", opacity: 0 }} animate={{ letterSpacing: "0.12em", opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }} className="text-2xl md:text-3xl font-semibold text-white text-center px-6">
+                {act?.title}
+              </motion.h3>
             </div>
-            <motion.div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 p-6 text-gray-200" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0, duration: 0.4 }}>
-              <div>
-                <div className="text-gray-400 text-sm">What I learned</div>
-                <ul className="mt-2 space-y-2 list-disc list-inside">{(act?.details?.learned || ["[placeholder]", "[placeholder]"]).map((x, i) => <li key={`l-${i}`}>{x}</li>)}</ul>
+            {/* content placeholder */}
+            <div className="relative z-10 h-full w-full flex items-end">
+              <div className="w-full p-6">
+                <div className="text-gray-400 text-sm uppercase tracking-widest">Overview</div>
+                <div className="mt-2 text-gray-200 text-base md:text-lg">[Placeholder content — story details will appear here.]</div>
               </div>
-              <div>
-                <div className="text-gray-400 text-sm">Key achievements</div>
-                <ul className="mt-2 space-y-2 list-disc list-inside">{(act?.details?.achievements || ["[placeholder]", "[placeholder]"]).map((x, i) => <li key={`a-${i}`}>{x}</li>)}</ul>
-              </div>
-              <div>
-                <div className="text-gray-400 text-sm">Responsibilities</div>
-                <ul className="mt-2 space-y-2 list-disc list-inside">{(act?.details?.responsibilities || ["[placeholder]", "[placeholder]"]).map((x, i) => <li key={`r-${i}`}>{x}</li>)}</ul>
-              </div>
-            </motion.div>
-            {act?.details?.jobs && (
-              <motion.div className="relative z-10 px-6 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 0.4 }}>
-                <div className="text-gray-400 text-sm">Roles</div>
-                <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {act.details.jobs.map((job, i) => (
-                    <div key={`j-${i}`} className="border border-white/10 rounded-lg p-3 bg-[rgba(14,14,16,0.6)]">
-                      <div className="text-white font-medium">{job.role}</div>
-                      <div className="text-gray-300 text-sm">{job.company}</div>
-                      <div className="text-gray-500 text-xs">{job.period}</div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+            </div>
           </motion.div>
         </motion.div>
       )}
@@ -219,7 +212,7 @@ function TypewriterPager() {
     setTyped("");
     setTyping(true);
     const text = pages[index];
-    const speed = 12; // ms per char (slower)
+    const speed = 5; // ms per char (slower)
     let i = 0;
     const id = setInterval(() => {
       i++;
@@ -238,16 +231,16 @@ function TypewriterPager() {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto mb-12" data-testid="journey-typewriter">
-      <div className="min-h-[160px]">
+    <div className="relative max-w-5xl mx-auto mb-12" data-testid="journey-typewriter">
+      <div className="min-h-[180px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={`page-${index}`}
-            initial={{ opacity: 0, x: 100, clipPath: "inset(0 0 0 100%)" }}
+            initial={{ opacity: 0, x: 130, clipPath: "inset(0 0 0 100%)" }}
             animate={{ opacity: 1, x: 0, clipPath: "inset(0 0 0 0)" }}
-            exit={{ opacity: 0, x: -220, clipPath: "inset(0 100% 0 0)" }}
-            transition={{ duration: 0.28, ease: [0.83, 0, 0.17, 1] }}
-            className="text-white text-base md:text-lg leading-relaxed font-[500]"
+            exit={{ opacity: 0, x: -260, clipPath: "inset(0 100% 0 0)" }}
+            transition={{ duration: 0.24, ease: [0.83, 0, 0.17, 1] }}
+            className="text-white text-[17px] md:text-[19px] leading-relaxed font-[500]"
           >
             {typed}
             {typing && <span className="inline-block w-[10px] h-[20px] bg-white ml-1 align-[-3px] animate-pulse" />}
@@ -256,23 +249,10 @@ function TypewriterPager() {
       </div>
 
       {/* dots navigator (4 pages) */}
-      <div className="mt-5 flex items-center justify-center gap-3">
+      <div className="mt-5 flex items-center justify-center gap-4">
         {pages.map((_, i) => (
-          <button
-            key={`dot-${i}`}
-            onClick={() => go(i)}
-            aria-label={`Go to paragraph ${i + 1}`}
-            className="relative"
-          >
-            <span
-              className="block w-[10px] h-[10px] rounded-full"
-              style={{
-                background: DOT_COLORS[i],
-                opacity: i === index ? 1 : 0.35,
-                boxShadow: i === index ? `0 0 14px ${DOT_COLORS[i]}AA, 0 0 30px ${DOT_COLORS[i]}55` : "none",
-                transition: "opacity 200ms ease",
-              }}
-            />
+          <button key={`dot-${i}`} onClick={() => go(i)} aria-label={`Go to paragraph ${i + 1}`} className="relative">
+            <span className="block w-[18px] h-[18px] rounded-full" style={{ background: DOT_COLORS[i], opacity: i === index ? 1 : 0.35, boxShadow: i === index ? `0 0 16px ${DOT_COLORS[i]}AA, 0 0 36px ${DOT_COLORS[i]}55` : "none", transition: "opacity 200ms ease" }} />
           </button>
         ))}
       </div>
@@ -288,6 +268,7 @@ export default function JourneyPortalsStatic() {
       <div className="absolute inset-0 -z-20" style={{ backgroundImage: `url('/atmos-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.34 }} />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/50 via-black/10 to-black/60" />
 
+      {/* Data stream (dynamic alignment will be attached in next commit) */}
       <DataStream />
 
       <div className="container mx-auto px-6 py-20 relative">
@@ -299,7 +280,7 @@ export default function JourneyPortalsStatic() {
         <TypewriterPager />
 
         {/* portals row */}
-        <div className="relative w-full flex items-end justify-center gap-[6vw]">
+        <div id="portal-row" className="relative w-full flex items-end justify-center gap-[6vw]">
           {ACTS.map((act) => (
             <Portal key={act.id} act={act} onClick={() => setModal({ open: true, act })} />
           ))}
