@@ -36,15 +36,51 @@ const ACTS = [
     id: "software",
     title: "Act II: Software Development",
     color: COLORS.green,
-    lines: ["Full‑stack delivery", "Cloud & ITSM"],
+    lines: ["From Hands-on Builder", "to Strategic Leader"],
     details: {
-      learned: ["Full‑stack patterns (SPA, REST)", "Azure/AWS", "ITSM (ServiceNow)"],
+      subtitle: "Junior Web Developer to Full Stack to Department Head",
+      skills: {
+        technical: [
+          "Team Leadership and Mentorship",
+          "System-Level Thinking",
+          "Project Management & Execution",
+          "Strategic Planning",
+          "Governance, Risk & Compliance (GRC)",
+          "Budgeting and Cost Control"
+        ],
+        workingKit: [
+          "Docker",
+          "Object Oriented Programming",
+          "SaaS",
+          "MERN Stack",
+          "LAMP Stack",
+          "Python",
+          "React Native",
+          "React.js",
+          "JavaScript",
+          "TypeScript",
+          "SQL",
+          "Bash/Shell Scripting",
+          "REST",
+          "GraphQL"
+        ]
+      },
       achievements: [
-        "Launched real‑time Admin Dashboard",
-        "Reduced MTTR by optimizing ITSM",
-        "Delivered end‑to‑end features",
+        "Led a Critical Legacy System Modernisation",
+        "A library of 40 responsive websites using advanced techniques and fully animated",
+        "Maintaining of any project to keep it functional even with animated based websites",
+        "Mentored a High-Performing Development Team",
+        "Managed version control using Git, ensuring smooth collaboration with the development team and maintaining code integrity across projects",
+        "Implemented and optimized IT service management processes using ServiceNow, reducing incident resolution time and improving overall user satisfaction"
       ],
-      responsibilities: ["Team leadership", "Solution delivery", "Infra direction & budgets"],
+      responsibilities: [
+        "Develop and execute the long-term technology roadmap",
+        "Govern high-level software architecture and technical standards",
+        "Drive innovation by evaluating and implementing new technologies",
+        "Lead, mentor, and manage the engineering team's performance",
+        "Drive hiring, retention, and career development for technical staff",
+        "Allocate engineering resources to align with business priorities"
+      ],
       jobs: [
         { role: "IT Head Officer", company: "Ammosshipping", period: "2019–2023" },
         { role: "Junior Web Developer", company: "GB Arena", period: "2014–2016" },
