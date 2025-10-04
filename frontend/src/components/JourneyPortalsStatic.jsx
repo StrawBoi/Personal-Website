@@ -344,7 +344,23 @@ function TypewriterPager() {
         </div>
       </div>
 
-      <div className="min-h-[200px]">
+      <div className="min-h-[200px] relative">
+        {/* Left arrow - Blue */}
+        <button
+          onClick={() => go(index - 1)}
+          disabled={index === 0}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 md:-translate-x-16 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+          style={{
+            background: COLORS.blue,
+            boxShadow: `0 0 20px ${COLORS.blue}AA, 0 0 40px ${COLORS.blue}55`,
+          }}
+          aria-label="Previous paragraph"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
         <AnimatePresence mode="wait">
           <motion.div
             key={`page-${index}`}
@@ -358,30 +374,22 @@ function TypewriterPager() {
             {typing && <span className="inline-block w-[10px] h-[20px] bg-white ml-1 align-[-3px] animate-pulse" />}
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* dots navigator */}
-      <div className="mt-6 flex items-center justify-center gap-6">
-        {pages.map((_, i) => (
-          <button
-            key={`dot-${i}`}
-            onClick={() => go(i)}
-            aria-label={`Go to paragraph ${i + 1}`}
-            className="relative outline-none focus:outline-none border-0 bg-transparent p-0"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            <span
-              className="block rounded-full"
-              style={{
-                width: 24, height: 24,
-                background: DOT_COLORS[i],
-                opacity: i === index ? 1 : 0.32,
-                boxShadow: i === index ? `0 0 18px ${DOT_COLORS[i]}AA, 0 0 40px ${DOT_COLORS[i]}55` : `0 0 8px ${DOT_COLORS[i]}33`,
-                transition: 'opacity 200ms ease, box-shadow 200ms ease',
-              }}
-            />
-          </button>
-        ))}
+        {/* Right arrow - Amber */}
+        <button
+          onClick={() => go(index + 1)}
+          disabled={index === pages.length - 1}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 md:translate-x-16 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed"
+          style={{
+            background: COLORS.amber,
+            boxShadow: `0 0 20px ${COLORS.amber}AA, 0 0 40px ${COLORS.amber}55`,
+          }}
+          aria-label="Next paragraph"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   );
