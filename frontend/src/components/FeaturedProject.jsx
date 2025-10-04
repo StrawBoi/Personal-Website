@@ -1,98 +1,78 @@
 import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-// Tackle project video
 const VIDEO_SRC = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/dearvwc8_Timeline%201.mov";
-const TECH_IMG = "https://customer-assets.emergentagent.com/job_dev-portfolio-609/artifacts/d6jidwc1_image.png"; // provided layer
 
-// Techy overlay background
-const TechLayer = () => (
-  <div className="absolute inset-0 opacity-60 pointer-events-none" style={{
-    backgroundImage: `url(${TECH_IMG}), radial-gradient(circle at 20% 30%, rgba(20,184,166,0.06) 0%, transparent 40%), radial-gradient(circle at 80% 70%, rgba(56,189,248,0.06) 0%, transparent 45%)`,
-    backgroundSize: 'cover, 160px 160px, 160px 160px',
-    backgroundPosition: 'center, center, center'
-  }} />
-);
-
-const FlipCard = ({ title, bullets, Icon }) => (
-  <div className="relative [transform-style:preserve-3d] group h-[220px] rounded-2xl border border-white/10 overflow-hidden" style={{ perspective: '1000px' }}>
-    {/* Back face (default) */}
-    <div className="absolute inset-0 bg-black/40 [backface-visibility:hidden] [transform:rotateY(0deg)] flex items-center justify-center">
-      <TechLayer />
-      <div className="text-white text-lg md:text-xl font-bold z-10 text-center px-6">
-        {Icon ? <div className="mx-auto mb-2" style={{ opacity: 0.85 }}>{<Icon />}</div> : null}
-        <span>{title}</span>
-      </div>
-    </div>
-    {/* Front face (info) */}
-    <div className="absolute inset-0 bg-black/80 [backface-visibility:hidden] [transform:rotateY(180deg)] flex items-center">
-      <div className="p-5">
-        <h5 className="text-white font-semibold mb-2">{title}</h5>
-        <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
-          {bullets.map((b, idx) => (<li key={idx}>{b}</li>))}
-        </ul>
-      </div>
-    </div>
-    {/* flip on hover */}
-    <style>{`.group:hover > div:first-child{transform:rotateY(-180deg)} .group:hover > div:last-child{transform:rotateY(0deg)}`}</style>
-  </div>
-);
-
-// Inline SVG icons
-const IconData = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h16M4 18h16" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
-const IconViz = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 18V6m5 12V9m5 9V4m5 14V12" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
-const IconAI = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="8" stroke="rgba(20,184,166,0.9)" strokeWidth="2"/><path d="M8 12h8M12 8v8" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
-const IconTools = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 7l10 10M17 7L7 17" stroke="rgba(20,184,166,0.9)" strokeWidth="2" strokeLinecap="round"/></svg>);
-
-const FeaturedProject = () => {
-  const sectionRef = useRef(null);
+export default function FeaturedProject() {
   const videoRef = useRef(null);
 
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start 80%", "end 20%"] });
-  const widthMV = useTransform(scrollYProgress, [0, 0.15, 0.7, 1], ["72vw", "100vw", "100vw", "88vw"]);
-  const radiusMV = useTransform(scrollYProgress, [0, 0.15, 0.9, 1], [18, 0, 12, 16]);
-  const vignetteOpacity = useTransform(scrollYProgress, [0.1, 0.2, 0.7, 0.9], [0, 0.35, 0.35, 0.1]);
-
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
+    const v = videoRef.current; if (!v) return;
     try { v.muted = true; v.playsInline = true; v.loop = true; v.autoplay = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); } catch {}
   }, []);
 
   return (
-    <section id="featured-project" ref={sectionRef} className="relative" style={{ height: '240vh' }} data-testid="section-featured-project">
-      {/* Sticky pinned full viewport */}
-      <div className="sticky top-0 h-screen flex items-center justify-center">
-        <motion.div style={{ width: widthMV, borderRadius: radiusMV }} className="max-w-[1920px] aspect-video overflow-hidden border border-white/10 bg-black relative" data-testid="featured-video-frame">
-          <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
-          <video ref={videoRef} src={VIDEO_SRC} className="w-full h-full object-cover" preload="auto" autoPlay muted loop playsInline />
-          <motion.div className="pointer-events-none absolute inset-0 z-20" style={{ opacity: vignetteOpacity }}>
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)' }} />
-          </motion.div>
-        </motion.div>
-      </div>
+    <section id="featured-project" className="relative py-24" data-testid="section-featured-project">
+      <div className="container mx-auto px-6">
+        <div className="mx-auto" style={{ maxWidth: 'calc(100vw - 8rem)' }}>
+          <div className="relative mx-auto" style={{ maxWidth: 'min(1200px, calc(100vw - 8rem))' }}>
+            {/* Neon amber border and constrained width */}
+            <div className="relative rounded-xl" style={{ boxShadow: '0 0 0 2px rgba(245,158,11,0.9), 0 0 24px rgba(245,158,11,0.5)' }}>
+              {/* black belonging layer */}
+              <div className="absolute inset-0 bg-black/65 pointer-events-none rounded-xl" />
+              <video ref={videoRef} src={VIDEO_SRC} className="w-full h-auto block rounded-xl" preload="auto" autoPlay muted loop playsInline />
+            </div>
+          </div>
 
-      {/* After takeover: spacing + question + flip cards with tech layer */}
-      <div className="container mx-auto px-6 mt-24 md:mt-28" data-testid="post-video-content" style={{ perspective: '1000px' }}>
-        <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.6 }} transition={{ duration: 0.6, ease: 'easeOut' }} className="max-w-5xl mx-auto text-center mb-12">
-          <h3 className="text-white text-xl md:text-2xl font-bold">
-            How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
-          </h3>
-        </motion.div>
+          {/* Headline */}
+          <div className="max-w-5xl mx-auto text-center mt-10">
+            <h3 className="text-white text-xl md:text-2xl font-bold">
+              How can we transition from reactive, manual purchasing to a proactive, data-driven procurement strategy that maximizes savings and provides a real-time competitive edge?
+            </h3>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-          <FlipCard title="Module 1: Data Collection Core" bullets={["Automated product price & stock tracking from URLs", "Continuous updates for real-time market view"]} Icon={IconData} />
-          <FlipCard title="Module 2: Analysis & Visualization Hub" bullets={["Historical Price Trend (line)", "Competitor Comparison (bar)", "Category Trend (area)", "Price vs Popularity (scatter)"]} Icon={IconViz} />
-          <FlipCard title="Module 3: AI Insight Layer" bullets={["Anomaly detection", "Trend analysis & forecasting", "Actionable recommendations"]} Icon={IconAI} />
-          <FlipCard title="Module 4: User-Centric Tools" bullets={["User accounts & saved products", "Smart alerts & email notifications", "CSV data export"]} Icon={IconTools} />
-        </div>
+          {/* Cards moved below without pinning */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto mt-10">
+            <div className="rounded-2xl border border-amber-500/50 bg-black/40 p-5 text-white">
+              <h5 className="font-semibold mb-2">Module 1: Data Collection Core</h5>
+              <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
+                <li>Automated product price & stock tracking from URLs</li>
+                <li>Continuous updates for real-time market view</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-amber-500/50 bg-black/40 p-5 text-white">
+              <h5 className="font-semibold mb-2">Module 2: Analysis & Visualization Hub</h5>
+              <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
+                <li>Historical Price Trend (line)</li>
+                <li>Competitor Comparison (bar)</li>
+                <li>Category Trend (area)</li>
+                <li>Price vs Popularity (scatter)</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-amber-500/50 bg-black/40 p-5 text-white">
+              <h5 className="font-semibold mb-2">Module 3: AI Insight Layer</h5>
+              <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
+                <li>Anomaly detection</li>
+                <li>Trend analysis & forecasting</li>
+                <li>Actionable recommendations</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-amber-500/50 bg-black/40 p-5 text-white">
+              <h5 className="font-semibold mb-2">Module 4: User-Centric Tools</h5>
+              <ul className="text-gray-300 list-disc pl-5 space-y-1 text-sm">
+                <li>User accounts & saved products</li>
+                <li>Smart alerts & email notifications</li>
+                <li>CSV data export</li>
+              </ul>
+            </div>
+          </div>
 
-        <div className="flex justify-center mt-10">
-          <a href="#contact" className="px-5 py-2 rounded border border-teal-500 text-white hover:bg-teal-500/20" data-testid="cta-learn-more">Learn more / Get in touch</a>
+          {/* CTA */}
+          <div className="flex justify-center mt-10">
+            <a href="#contact" className="px-5 py-2 rounded border border-amber-500 text-white hover:bg-amber-500/10" data-testid="cta-learn-more">Learn more / Get in touch</a>
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default FeaturedProject;
+}
