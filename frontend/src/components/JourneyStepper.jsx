@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import React, { useRef, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionTemplate } from "framer-motion";
 
 const COLORS = {
   blue: "#00BFFF",
@@ -57,8 +57,6 @@ const ACTS = [
     ],
   },
 ];
-
-function clamp01(x) { return Math.max(0, Math.min(1, x)); }
 
 function FullscreenModal({ open, onClose, act }) {
   return (
@@ -133,11 +131,12 @@ function HighlightReel({ visible, color, items }) {
 }
 
 function ActCard({ act, state, onClick }) {
-  // state: 0..1 active strength (1 = focused)
-  const scale = 0.95 + 0.1 * state;
-  const opacity = 0.5 + 0.5 * state;
-  const blur = `${(1 - state) * 6}px`;
-  const translateY = (1 - state) * 80; // fly-in from bottom towards center
+  // state is a MotionValue in [0,1]
+  const scale = useTransform(state, [0, 1], [0.95, 1.05]);
+  const opacity = useTransform(state, [0, 1], [0.5, 1]);
+  const translateY = useTransform(state, [0, 1], [80, 0]);
+  const blurPx = useTransform(state, [0, 1], [6, 0]);
+  const blurFilter = useMotionTemplate`blur(${blurPx}px)`;
 
   return (
     <motion.button
@@ -150,10 +149,11 @@ function ActCard({ act, state, onClick }) {
         boxShadow: `0 0 30px ${act.color}40, inset 0 0 24px ${act.color}25`,
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
-        filter: `blur(${blur})`,
+        scale,
+        opacity,
+        y: translateY,
+        filter: blurFilter,
       }}
-      initial={false}
-      animate={{ scale, opacity, y: translateY }}
       transition={{ type: "spring", stiffness: 220, damping: 26 }}
     >
       {/* subtle symbolic background */}
@@ -185,13 +185,12 @@ export default function JourneyStepper() {
   // modal state
   const [modal, setModal] = useState({ open: false, act: null });
 
-  // derived animated states
   const states = [segment1, segment2, segment3];
 
   return (
     <section id="journey-stepper" className="relative bg-black" data-testid="journey-stepper-section">
       {/* Scroll container 300vh with sticky viewport */}
-      <div ref={containerRef} style={{ height: "300vh" }}>
+      <div ref={containerRef} style={{ height: "300vh", position: "relative" }}>
         <div className="sticky top-0 h-screen overflow-hidden">
           <div className="absolute inset-0 -z-10">
             {/* atmospheric ripples */}
@@ -210,7 +209,7 @@ export default function JourneyStepper() {
             <ActCard key={act.id} act={act} state={states[i]} onClick={() => setModal({ open: true, act })} />
           ))}
 
-          {/* Highlight reels: only show for focused card (state > ~0.6). Render three and let opacity follow state */}
+          {/* Highlight reels */}
           {ACTS.map((act, i) => (
             <motion.div key={`reel-${act.id}`} className="absolute inset-0" style={{ opacity: states[i] }}>
               <HighlightReel visible={true} color={act.color} items={act.highlights} />
