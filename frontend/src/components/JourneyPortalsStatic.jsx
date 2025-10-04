@@ -168,22 +168,31 @@ function CinematicModal({ open, onClose, act }) {
           <div className="absolute inset-0 bg-black/85" onClick={onClose} />
           <motion.div 
             className="relative w-[min(1100px,90vw)] max-h-[88vh] rounded-xl overflow-hidden text-white"
-            initial={{ scale: 0.9, opacity: 0 }} 
-            animate={{ scale: 1, opacity: 1 }} 
+            initial={{ scale: 0.5, opacity: 0, width: "200px", height: "200px" }} 
+            animate={{ 
+              scale: [0.5, 1.15, 1], 
+              opacity: [0, 1, 1],
+              width: ["200px", "min(1100px,90vw)", "min(1100px,90vw)"],
+              height: ["200px", "88vh", "88vh"]
+            }} 
             exit={{ scale: 0.96, opacity: 0 }} 
-            transition={{ type: "spring", stiffness: 240, damping: 26 }}
+            transition={{ 
+              duration: 0.6,
+              times: [0, 0.6, 1],
+              ease: [0.22, 1, 0.36, 1]
+            }}
             style={{
-              background: "linear-gradient(to bottom, rgba(30,30,32,0.98), rgba(20,20,22,0.98))",
+              background: "#000000",
               border: "1px solid rgba(60,60,62,0.9)",
               boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05)",
             }}
           >
             {/* macOS window controls */}
-            <div className="sticky top-0 z-20 flex items-center px-4 py-3 border-b border-gray-700/50 bg-gradient-to-b from-[rgba(40,40,42,0.95)] to-[rgba(35,35,37,0.95)]" style={{ backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
+            <div className="sticky top-0 z-20 flex items-center px-4 py-3 border-b border-gray-700/50" style={{ background: "#000000", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
               <div className="flex gap-2">
-                <button onClick={onClose} className="w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff4d43] transition-colors" aria-label="Close" />
-                <button className="w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffb01f] transition-colors" aria-label="Minimize" />
-                <button className="w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#1fb932] transition-colors" aria-label="Maximize" />
+                <button onClick={onClose} className="w-3 h-3 rounded-full transition-colors" style={{ background: COLORS.teal }} aria-label="Close" />
+                <button className="w-3 h-3 rounded-full transition-colors" style={{ background: COLORS.amber }} aria-label="Minimize" />
+                <button className="w-3 h-3 rounded-full transition-colors" style={{ background: COLORS.green }} aria-label="Maximize" />
               </div>
               <div className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-400 font-medium tracking-wide">
                 {act.title}
