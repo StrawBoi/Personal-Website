@@ -217,29 +217,45 @@ function CinematicModal({ open, onClose, act }) {
                   </motion.div>
 
                   {/* Two columns: Key Skills & Technical Skills */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <motion.div 
+                    className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  >
                     <div>
                       <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Key Skills Honed</h3>
                       <ul className="space-y-2 text-gray-300">
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Mastering Soft Skills</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Communication</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Problem Solving</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Emotional Intelligence</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Time Management</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Product knowledge</li>
+                        {["Mastering Soft Skills", "Communication", "Problem Solving", "Emotional Intelligence", "Time Management", "Product knowledge"].map((skill, i) => (
+                          <motion.li 
+                            key={i}
+                            className="flex items-start"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
+                          >
+                            <span className="text-teal-400 mr-2">•</span>{skill}
+                          </motion.li>
+                        ))}
                       </ul>
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-white mb-4 border-b border-teal-500/40 pb-2">Technical Skills</h3>
                       <ul className="space-y-2 text-gray-300">
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Clear Communication of Technical Information</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Documentation and Attention to Detail</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Adaptability and Continuous Learning</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Adapting to Different CRM Software</li>
-                        <li className="flex items-start"><span className="text-teal-400 mr-2">•</span>Understanding Different Ticketing Systems</li>
+                        {["Clear Communication of Technical Information", "Documentation and Attention to Detail", "Adaptability and Continuous Learning", "Adapting to Different CRM Software", "Understanding Different Ticketing Systems"].map((skill, i) => (
+                          <motion.li 
+                            key={i}
+                            className="flex items-start"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: 0.4 + i * 0.05 }}
+                          >
+                            <span className="text-teal-400 mr-2">•</span>{skill}
+                          </motion.li>
+                        ))}
                       </ul>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Key Achievements */}
                   <div>
