@@ -14,17 +14,42 @@ export default function FeaturedProject() {
   const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.7, 1.02, 1.02, 0.8]);
   const borderRadius = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [32, 12, 12, 28]);
   const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0.3, 1, 1, 0.4]);
+  
+  // Dimming layer: strong at start, fades when maximized, returns slightly at end
+  const dimmingOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.65, 0.15, 0.15, 0.5]);
 
   useEffect(() => {
     const v = videoRef.current; if (!v) return;
-    try { 
+    
+    // Reset video to beginning and play
+    const resetAndPlay = () => {
+      v.currentTime = 0;
       v.muted = true; 
       v.playsInline = true; 
       v.loop = true; 
-      v.autoplay = true; 
       const p = v.play(); 
-      if (p && p.catch) p.catch(() => {}); 
-    } catch {}
+      if (p && p.catch) p.catch(() => {});
+    };
+    
+    resetAndPlay();
+    
+    // Listen for scroll to reset video when entering section
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            resetAndPlay();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+    
+    return () => observer.disconnect();
   }, []);
 
   return (
