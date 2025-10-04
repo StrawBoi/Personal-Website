@@ -204,12 +204,17 @@ function CinematicModal({ open, onClose, act }) {
               {act.id === "communication" ? (
                 <div className="space-y-8">
                   {/* Top wide section */}
-                  <div className="text-center pb-6 border-b border-gray-700/40">
+                  <motion.div 
+                    className="text-center pb-6 border-b border-gray-700/40"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">The Journey of Communication</h2>
                     <p className="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
                       Honing the skills and crafting the key learnings that lead the rest of my journey.
                     </p>
-                  </div>
+                  </motion.div>
 
                   {/* Two columns: Key Skills & Technical Skills */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
