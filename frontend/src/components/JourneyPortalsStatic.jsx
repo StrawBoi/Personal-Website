@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COLORS = { blue: "#00BFFF", green: "#34d399", amber: "#f59e0b" };
@@ -68,7 +68,7 @@ const ACTS = [
   },
 ];
 
-function DataStream() {
+function DataStream({ pathD }) {
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden>
       <defs>
@@ -88,10 +88,9 @@ function DataStream() {
         </filter>
       </defs>
 
-      {/* Curve anchors will map to portal centers via JS after mount */}
-      <path id="streamPath" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="14" opacity="0.25" filter="url(#glowBlur)" />
-      <path id="streamMain" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="3" opacity="0.88" />
-      <path id="streamDash" d="M 120 300 C 380 220 620 380 880 280" fill="none" stroke="url(#dsGradient)" strokeWidth="4" strokeDasharray="16 26" opacity="0.85">
+      <path id="streamGlow" d={pathD} fill="none" stroke="url(#dsGradient)" strokeWidth="14" opacity="0.25" filter="url(#glowBlur)" />
+      <path id="streamMain" d={pathD} fill="none" stroke="url(#dsGradient)" strokeWidth="3" opacity="0.88" />
+      <path id="streamDash" d={pathD} fill="none" stroke="url(#dsGradient)" strokeWidth="4" strokeDasharray="16 26" opacity="0.85">
         <animate attributeName="stroke-dashoffset" from="0" to="-200" dur="3s" repeatCount="indefinite" />
       </path>
       {[0, 0.33, 0.66].map((delay, idx) => (
@@ -172,19 +171,16 @@ function CinematicModal({ open, onClose, act }) {
               boxShadow: `0 0 0 2px ${act?.color}AA, 0 0 36px ${act?.color}AA, 0 0 72px ${act?.color}55, inset 0 0 24px ${act?.color}22`,
             }}
           >
-            {/* inner neon rim */}
             <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: `inset 0 0 60px ${act?.color}22` }} />
-            {/* title center */}
             <div className="absolute inset-0 flex items-center justify-center">
               <motion.h3 initial={{ letterSpacing: "0.05em", opacity: 0 }} animate={{ letterSpacing: "0.12em", opacity: 1 }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }} className="text-2xl md:text-3xl font-semibold text-white text-center px-6">
                 {act?.title}
               </motion.h3>
             </div>
-            {/* content placeholder */}
             <div className="relative z-10 h-full w-full flex items-end">
               <div className="w-full p-6">
-                <div className="text-gray-400 text-sm uppercase tracking-widest">Overview</div>
-                <div className="mt-2 text-gray-200 text-base md:text-lg">[Placeholder content — story details will appear here.]</div>
+                <div className="text-gray-300 text-sm uppercase tracking-widest">Overview</div>
+                <div className="mt-2 text-white text-base md:text-lg">[Placeholder content — story details will appear here.]</div>
               </div>
             </div>
           </motion.div>
@@ -212,23 +208,17 @@ function TypewriterPager() {
     setTyped("");
     setTyping(true);
     const text = pages[index];
-    const speed = 5; // ms per char (slower)
+    const speed = 5;
     let i = 0;
     const id = setInterval(() => {
       i++;
       setTyped(text.slice(0, i));
-      if (i >= text.length) {
-        clearInterval(id);
-        setTyping(false);
-      }
+      if (i >= text.length) { clearInterval(id); setTyping(false); }
     }, speed);
     return () => clearInterval(id);
   }, [index]);
 
-  const go = (n) => {
-    if (n < 0 || n >= pages.length) return;
-    setIndex(n);
-  };
+  const go = (n) => { if (n < 0 || n >= pages.length) return; setIndex(n); };
 
   return (
     <div className="relative max-w-5xl mx-auto mb-12" data-testid="journey-typewriter">
@@ -247,12 +237,10 @@ function TypewriterPager() {
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {/* dots navigator (4 pages) */}
       <div className="mt-5 flex items-center justify-center gap-4">
         {pages.map((_, i) => (
           <button key={`dot-${i}`} onClick={() => go(i)} aria-label={`Go to paragraph ${i + 1}`} className="relative">
-            <span className="block w-[18px] h-[18px] rounded-full" style={{ background: DOT_COLORS[i], opacity: i === index ? 1 : 0.35, boxShadow: i === index ? `0 0 16px ${DOT_COLORS[i]}AA, 0 0 36px ${DOT_COLORS[i]}55` : "none", transition: "opacity 200ms ease" }} />
+            <span className="block w-[18px] h-[18px] rounded-full" style={{ background: DOT_COLORS[i], opacity: i === index ? 1 : 0.35, boxShadow: i === index ? `0 0 16px ${DOT_COLORS[i]}AA, 0 0 36px ${DOT_COLORS[i]}55` : 'none', transition: 'opacity 200ms ease' }} />
           </button>
         ))}
       </div>
@@ -262,24 +250,56 @@ function TypewriterPager() {
 
 export default function JourneyPortalsStatic() {
   const [modal, setModal] = useState({ open: false, act: null });
+  const sectionRef = useRef(null);
+  const [pathD, setPathD] = useState("M 120 300 C 380 220 620 380 880 280");
+
+  // Align data stream through portal centers
+  useEffect(() => {
+    const compute = () => {
+      const sec = sectionRef.current;
+      if (!sec) return;
+      const row = sec.querySelector('#portal-row');
+      if (!row) return;
+      const portals = Array.from(row.querySelectorAll('.portal-btn'));
+      if (portals.length < 3) return;
+      const srect = sec.getBoundingClientRect();
+      const pts = portals.map((el) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2 - srect.left;
+        const cy = r.top + r.height * 0.75 - srect.top; // 3/4 height for a lower pass
+        return { x: cx, y: cy };
+      });
+      const sx = 1000 / srect.width;
+      const sy = 420 / srect.height;
+      const P = pts.map((p) => ({ x: p.x * sx, y: p.y * sy }));
+      // Build cubic spline M P0 C ... S ... P2
+      const p0 = P[0], p1 = P[1], p2 = P[2];
+      const c1 = { x: p0.x + (p1.x - p0.x) / 3, y: p0.y - (p1.y - p0.y) * 0.25 };
+      const c2 = { x: p0.x + (p1.x - p0.x) * 2 / 3, y: p0.y + (p1.y - p0.y) * 0.25 };
+      const c3 = { x: p1.x + (p2.x - p1.x) / 3, y: p1.y - (p2.y - p1.y) * 0.25 };
+      const d = `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} C ${c1.x.toFixed(1)},${c1.y.toFixed(1)} ${c2.x.toFixed(1)},${c2.y.toFixed(1)} ${p1.x.toFixed(1)},${p1.y.toFixed(1)} S ${c3.x.toFixed(1)},${c3.y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+      setPathD(d);
+    };
+    // compute after paint
+    const id = requestAnimationFrame(compute);
+    window.addEventListener('resize', compute);
+    return () => { cancelAnimationFrame(id); window.removeEventListener('resize', compute); };
+  }, []);
 
   return (
-    <section className="relative bg-black" data-testid="journey-portals-static">
+    <section ref={sectionRef} className="relative bg-black" data-testid="journey-portals-static">
       <div className="absolute inset-0 -z-20" style={{ backgroundImage: `url('/atmos-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.34 }} />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/50 via-black/10 to-black/60" />
 
-      {/* Data stream (dynamic alignment will be attached in next commit) */}
-      <DataStream />
+      <DataStream pathD={pathD} />
 
       <div className="container mx-auto px-6 py-20 relative">
         <div className="text-center mb-6">
           <h2 className="text-2xl md:text-3xl font-semibold text-white">My Journey</h2>
         </div>
 
-        {/* Typewriter narrative */}
         <TypewriterPager />
 
-        {/* portals row */}
         <div id="portal-row" className="relative w-full flex items-end justify-center gap-[6vw]">
           {ACTS.map((act) => (
             <Portal key={act.id} act={act} onClick={() => setModal({ open: true, act })} />
