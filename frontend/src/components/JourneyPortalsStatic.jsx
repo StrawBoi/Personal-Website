@@ -328,9 +328,20 @@ function TypewriterPager() {
 
   return (
     <div className="relative max-w-5xl mx-auto mb-12" data-testid="journey-typewriter">
-      {/* greenish neon accent line under heading */}
+      {/* enhanced neon accent line under heading */}
       <div className="flex items-center justify-center mb-5">
-        <div className="w-[2px] h-6" style={{ background: COLORS.teal, boxShadow: `0 0 12px ${COLORS.teal}` }} />
+        <div className="relative">
+          <div className="w-[3px] h-12" style={{ 
+            background: `linear-gradient(to bottom, ${COLORS.teal}, ${COLORS.green})`, 
+            boxShadow: `0 0 20px ${COLORS.teal}, 0 0 40px ${COLORS.teal}77, 0 0 60px ${COLORS.teal}44`,
+            filter: 'brightness(1.2)'
+          }} />
+          <div className="absolute inset-0 animate-pulse" style={{
+            background: `linear-gradient(to bottom, ${COLORS.teal}, ${COLORS.green})`,
+            filter: 'blur(8px)',
+            opacity: 0.6
+          }} />
+        </div>
       </div>
 
       <div className="min-h-[200px]">
