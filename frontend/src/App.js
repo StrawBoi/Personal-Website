@@ -8,6 +8,7 @@ import Toolkit from "./components/Toolkit";
 import Contact from "./components/Contact";
 import GlobalBackground from "./components/GlobalBackground";
 import DataStream from "./components/DataStream";
+import AnimatedNav from "./components/AnimatedNav";
 
 const scrollStyles = `
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
