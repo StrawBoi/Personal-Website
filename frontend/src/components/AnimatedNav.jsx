@@ -19,8 +19,8 @@ const AnimatedNav = () => {
 
   return (
     <>
-      {/* Transparent Header */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,0.3)' }} data-testid="navbar">
+      {/* Fully Transparent Header - video shows through */}
+      <nav className="fixed top-0 w-full z-50" data-testid="navbar">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
